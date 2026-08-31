@@ -185,8 +185,8 @@ h1, h2 {
 }
 
 .next-match-teams .vs {
-  color: var(--color-text-muted);
-  font-size: 1.2rem;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .next-match-date {
@@ -368,6 +368,10 @@ h1, h2 {
   background: var(--color-surface);
   font-size: 0.85rem;
   color: var(--color-text-muted);
+}
+
+.page-footer .credit {
+  margin-right: auto;
 }
 
 .status-badge {

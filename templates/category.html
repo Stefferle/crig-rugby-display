@@ -9,18 +9,12 @@
 {% set last_result = data.results[-1] %}
 <section class="next-match-banner">
     <span class="next-match-label">Dernier résultat{% if last_result.journee %} — {{ last_result.journee }}{% endif %}</span>
-    {% set crig_is_home = last_result.home_team == team_name %}
-    {% set crig_logo = last_result.home_logo if crig_is_home else last_result.away_logo %}
-    {% set crig_score = last_result.home_score if crig_is_home else last_result.away_score %}
-    {% set opponent_name = last_result.away_team if crig_is_home else last_result.home_team %}
-    {% set opponent_logo = last_result.away_logo if crig_is_home else last_result.home_logo %}
-    {% set opponent_score = last_result.away_score if crig_is_home else last_result.home_score %}
     <div class="next-match-teams">
-        <span class="team">CRIG</span>
-        {% if crig_logo %}<img class="next-match-logo" src="{{ crig_logo }}" alt="">{% endif %}
-        <span class="score">{{ crig_score if crig_score is not none else '—' }} - {{ opponent_score if opponent_score is not none else '—' }}</span>
-        {% if opponent_logo %}<img class="next-match-logo" src="{{ opponent_logo }}" alt="">{% endif %}
-        <span class="team">{{ opponent_name }}</span>
+        <span class="team">{{ club_name(last_result.home_team) }}</span>
+        {% if last_result.home_logo %}<img class="next-match-logo" src="{{ last_result.home_logo }}" alt="">{% endif %}
+        <span class="score">{{ last_result.home_score if last_result.home_score is not none else '—' }} - {{ last_result.away_score if last_result.away_score is not none else '—' }}</span>
+        {% if last_result.away_logo %}<img class="next-match-logo" src="{{ last_result.away_logo }}" alt="">{% endif %}
+        <span class="team">{{ club_name(last_result.away_team) }}</span>
     </div>
     <span class="next-match-date">{{ last_result.date_label }}</span>
 </section>
@@ -29,16 +23,12 @@
 <section class="next-match-banner">
     {% if next_match %}
     <span class="next-match-label">Prochain match{% if next_match.journee %} — {{ next_match.journee }}{% endif %}</span>
-    {% set crig_is_home = next_match.home_team == team_name %}
-    {% set crig_logo = next_match.home_logo if crig_is_home else next_match.away_logo %}
-    {% set opponent_name = next_match.away_team if crig_is_home else next_match.home_team %}
-    {% set opponent_logo = next_match.away_logo if crig_is_home else next_match.home_logo %}
     <div class="next-match-teams">
-        <span class="team">CRIG</span>
-        {% if crig_logo %}<img class="next-match-logo" src="{{ crig_logo }}" alt="">{% endif %}
-        <span class="vs">-</span>
-        {% if opponent_logo %}<img class="next-match-logo" src="{{ opponent_logo }}" alt="">{% endif %}
-        <span class="team">{{ opponent_name }}</span>
+        <span class="team">{{ club_name(next_match.home_team) }}</span>
+        {% if next_match.home_logo %}<img class="next-match-logo" src="{{ next_match.home_logo }}" alt="">{% endif %}
+        <span class="vs">🏉</span>
+        {% if next_match.away_logo %}<img class="next-match-logo" src="{{ next_match.away_logo }}" alt="">{% endif %}
+        <span class="team">{{ club_name(next_match.away_team) }}</span>
     </div>
     <span class="next-match-date">{{ next_match.date_label }}{% if next_match.heure %} — {{ next_match.heure }}{% endif %}</span>
     {% else %}
