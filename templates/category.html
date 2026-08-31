@@ -38,7 +38,7 @@
 
 {% if data.engaged_clubs and not data.standings and not data.results and not data.calendar %}
 <section class="engaged-clubs-panel">
-    <h2>Clubs engagés</h2>
+    <h2>Clubs de la poule</h2>
     <ul class="engaged-clubs-list">
         {% for club in data.engaged_clubs %}
         <li class="{{ 'crig-row' if club.name == team_name else '' }}">
