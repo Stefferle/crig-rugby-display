@@ -20,6 +20,7 @@ club_aliases:
   "Grenoble UC - Saint Martin D'heres": "Grenoble UC - Saint Martin d'Hères"
   "Saint Jean De Bournay": "Saint-Jean-de-Bournay"
   "Rillieux La Pape": "Rillieux-la-Pape"
+  "Saint Claude": "Saint-Claude"
 
 # Une entrée par catégorie à afficher. "slug" sert de nom de fichier de sortie
 # (ex: f2 -> output/f2.html) et doit rester stable (utilisé aussi dans le cache).
