@@ -1,0 +1,15 @@
+[Unit]
+Description=CRIG Rugby - affichage résultats
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/crig-rugby-display
+ExecStart=/home/pi/crig-rugby-display/.venv/bin/python -m crig_rugby run
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

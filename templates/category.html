@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% macro club_name(name) -%}
+{{ 'CRIG' if name == team_name else name }}
+{%- endmacro %}
+
+{% if data.results %}
+{% set last_result = data.results[-1] %}
+<section class="next-match-banner">
+    <span class="next-match-label">Dernier résultat{% if last_result.journee %} — {{ last_result.journee }}{% endif %}</span>
+    {% set crig_is_home = last_result.home_team == team_name %}
+    {% set crig_logo = last_result.home_logo if crig_is_home else last_result.away_logo %}
+    {% set crig_score = last_result.home_score if crig_is_home else last_result.away_score %}
+    {% set opponent_name = last_result.away_team if crig_is_home else last_result.home_team %}
+    {% set opponent_logo = last_result.away_logo if crig_is_home else last_result.home_logo %}
+    {% set opponent_score = last_result.away_score if crig_is_home else last_result.home_score %}
+    <div class="next-match-teams">
+        <span class="team">CRIG</span>
+        {% if crig_logo %}<img class="next-match-logo" src="{{ crig_logo }}" alt="">{% endif %}
+        <span class="score">{{ crig_score if crig_score is not none else '—' }} - {{ opponent_score if opponent_score is not none else '—' }}</span>
+        {% if opponent_logo %}<img class="next-match-logo" src="{{ opponent_logo }}" alt="">{% endif %}
+        <span class="team">{{ opponent_name }}</span>
+    </div>
+    <span class="next-match-date">{{ last_result.date_label }}</span>
+</section>
+{% endif %}
+
+<section class="next-match-banner">
+    {% if next_match %}
+    <span class="next-match-label">Prochain match{% if next_match.journee %} — {{ next_match.journee }}{% endif %}</span>
+    {% set crig_is_home = next_match.home_team == team_name %}
+    {% set crig_logo = next_match.home_logo if crig_is_home else next_match.away_logo %}
+    {% set opponent_name = next_match.away_team if crig_is_home else next_match.home_team %}
+    {% set opponent_logo = next_match.away_logo if crig_is_home else next_match.home_logo %}
+    <div class="next-match-teams">
+        <span class="team">CRIG</span>
+        {% if crig_logo %}<img class="next-match-logo" src="{{ crig_logo }}" alt="">{% endif %}
+        <span class="vs">-</span>
+        {% if opponent_logo %}<img class="next-match-logo" src="{{ opponent_logo }}" alt="">{% endif %}
+        <span class="team">{{ opponent_name }}</span>
+    </div>
+    <span class="next-match-date">{{ next_match.date_label }}{% if next_match.heure %} — {{ next_match.heure }}{% endif %}</span>
+    {% else %}
+    <span class="next-match-label">Aucun prochain match programmé pour le moment</span>
+    {% endif %}
+</section>
+
+{% if data.engaged_clubs and not data.standings and not data.results and not data.calendar %}
+<section class="engaged-clubs-panel">
+    <h2>Clubs engagés</h2>
+    <ul class="engaged-clubs-list">
+        {% for club in data.engaged_clubs %}
+        <li class="{{ 'crig-row' if club.name == team_name else '' }}">
+            {% if club.logo_url %}<img class="club-logo-small" src="{{ club.logo_url }}" alt="">{% endif %}
+            <span>{{ club_name(club.name) }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% else %}
+<div class="content-columns">
+    <section class="standings-panel">
+        <h2>Classement</h2>
+        {% if data.standings %}
+        {% set half = (data.standings|length + 1) // 2 %}
+        <div class="standings-columns">
+            {% for group in [data.standings[:half], data.standings[half:]] %}
+            <table class="standings-table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th></th>
+                    <th>Équipe</th>
+                    <th>Pts</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in group %}
+                <tr class="{{ 'crig-row' if row.is_crig else '' }}">
+                    <td>{{ row.rank }}</td>
+                    <td>{% if row.logo_url %}<img class="standings-logo" src="{{ row.logo_url }}" alt="">{% endif %}</td>
+                    <td>{{ club_name(row.team) }}</td>
+                    <td>{{ row.points }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">Classement pas encore disponible.</p>
+        {% endif %}
+    </section>
+
+    <section class="calendar-panel">
+        <h2>Calendrier à venir</h2>
+        {% if data.calendar %}
+        <ul class="match-list">
+            {% for m in data.calendar[:6] %}
+            <li>
+                <span class="match-date">{{ m.date_label }}{% if m.journee %} ({{ m.journee }}){% endif %}</span>
+                <span class="team">{{ club_name(m.home_team) }}</span>
+                <span class="vs">-</span>
+                <span class="team">{{ club_name(m.away_team) }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-state">Calendrier pas encore disponible.</p>
+        {% endif %}
+    </section>
+</div>
+{% endif %}
+
+{% endblock %}

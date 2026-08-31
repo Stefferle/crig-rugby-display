@@ -1,0 +1,383 @@
+/*
+ * Thème visuel CRIG Rugby.
+ * Point d'entrée UNIQUE pour la charte graphique : remplacer les valeurs des
+ * variables ci-dessous (et/ou static/img/logo-crig.png) suffit à ré-habiller
+ * toutes les pages générées.
+ * Palette et logo repris de https://crig-rugby.com (rouge d'accent confirmé
+ * dans le CSS du site : #E73A37 ; noir/anthracite dominant du blason).
+ */
+
+@font-face {
+  font-family: "Oswald";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/static/fonts/oswald-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Oswald";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/static/fonts/oswald-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/static/fonts/roboto-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/static/fonts/roboto-700.woff2") format("woff2");
+}
+
+:root {
+  --color-bg: #141414;
+  --color-surface: #1f1f1f;
+  --color-surface-alt: #262626;
+  --color-border: #333333;
+  --color-text: #ffffff;
+  --color-text-muted: #a0a0a0;
+  --color-accent: #e73a37;
+  --color-accent-soft: rgba(231, 58, 55, 0.16);
+
+  --font-heading: "Oswald", "Arial Narrow", sans-serif;
+  --font-body: "Roboto", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* Design pensé pour un écran 1920x1080 : 1rem = 1% de la largeur d'écran. */
+  font-size: 1vw;
+}
+
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ---------- Header ---------- */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.2rem 2rem;
+  background: var(--color-surface);
+  border-bottom: 0.25rem solid var(--color-accent);
+}
+
+.club-logo {
+  height: 4.5rem;
+  width: auto;
+}
+
+.header-titles {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.club-name {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  letter-spacing: 0.2rem;
+  color: var(--color-accent);
+}
+
+.category-title {
+  font-size: 2rem;
+  letter-spacing: 0.05rem;
+}
+
+.category-nav {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.category-nav a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.4rem;
+  border: 0.06rem solid var(--color-border);
+}
+
+.category-nav a.active {
+  color: var(--color-bg);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* ---------- Contenu ---------- */
+
+.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.8rem 2rem;
+  min-height: 0;
+}
+
+.next-match-banner {
+  background: var(--color-accent-soft);
+  border: 0.08rem solid var(--color-accent);
+  border-radius: 0.8rem;
+  padding: 1.2rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 2rem;
+}
+
+.next-match-label {
+  font-family: var(--font-heading);
+  color: var(--color-accent);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  justify-self: start;
+}
+
+.next-match-banner > .next-match-label:only-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+.next-match-teams {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-self: center;
+}
+
+.next-match-logo {
+  height: 3rem;
+  width: 3rem;
+  object-fit: contain;
+}
+
+.next-match-teams .vs {
+  color: var(--color-text-muted);
+  font-size: 1.2rem;
+}
+
+.next-match-date {
+  color: var(--color-text-muted);
+  font-size: 1.2rem;
+  font-weight: 700;
+  justify-self: end;
+}
+
+.next-match-teams .score {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-accent);
+  margin: 0 0.3rem;
+}
+
+.content-columns {
+  flex: 1;
+  display: flex;
+  gap: 1.5rem;
+  min-height: 0;
+}
+
+.standings-panel {
+  flex: 1.4;
+  background: var(--color-surface);
+  border-radius: 0.8rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.calendar-panel {
+  background: var(--color-surface);
+  border-radius: 0.8rem;
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.standings-columns {
+  flex: 1;
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.8rem;
+  min-height: 0;
+}
+
+.standings-table {
+  flex: 1;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.standings-table th {
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 0.4rem 0.3rem;
+  border-bottom: 0.08rem solid var(--color-border);
+}
+
+.standings-table td {
+  text-align: center;
+  padding: 0.5rem 0.3rem;
+  border-bottom: 0.06rem solid var(--color-border);
+}
+
+.standings-table td:nth-child(3) {
+  text-align: left;
+}
+
+.standings-logo {
+  height: 2rem;
+  width: 2rem;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.standings-table tr.crig-row {
+  background: var(--color-accent-soft);
+  font-weight: 700;
+}
+
+.match-list {
+  list-style: none;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  overflow: hidden;
+}
+
+.match-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.05rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 0.06rem solid var(--color-border);
+  flex-wrap: wrap;
+}
+
+.match-list .match-date {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  flex-basis: 100%;
+}
+
+.engaged-clubs-panel {
+  flex: 1;
+  background: var(--color-surface);
+  border-radius: 0.8rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.engaged-clubs-panel h2 {
+  margin-bottom: 1.8rem;
+}
+
+.engaged-clubs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 2rem 3rem;
+  max-width: 90%;
+}
+
+.engaged-clubs-list li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 10rem;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.club-logo-small {
+  height: 4rem;
+  width: 4rem;
+  object-fit: contain;
+}
+
+.engaged-clubs-list li.crig-row {
+  font-weight: 700;
+}
+
+.empty-state {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* ---------- Footer ---------- */
+
+.page-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 2rem;
+  background: var(--color-surface);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.status-badge {
+  padding: 0.2rem 0.7rem;
+  border-radius: 0.4rem;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+}
+
+.status-badge.status-stale {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
