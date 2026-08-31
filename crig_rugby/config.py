@@ -21,6 +21,7 @@ class Competition:
 class Config:
     team_name: str
     competitions: list[Competition]
+    club_aliases: dict[str, str] = field(default_factory=dict)
     port: int = 8090
     rotation_seconds: int = 20
     weekend_start: int = 7
@@ -72,6 +73,7 @@ def load_config(path: Path | str | None = None) -> Config:
     return Config(
         team_name=raw["team_name"],
         competitions=competitions,
+        club_aliases=raw.get("club_aliases", {}),
         port=server.get("port", 8090),
         rotation_seconds=server.get("rotation_seconds", 20),
         weekend_start=schedule.get("weekend_start", 7),

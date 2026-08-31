@@ -3,6 +3,14 @@
 # la ligne du club dans les tableaux de classement et les pages d'équipe.
 team_name: "Illkirch Graffenstaden"
 
+# Corrections de noms de club à l'affichage uniquement (le scraping et la
+# détection du club suivi utilisent toujours le nom exact ci-dessus / celui
+# du site). Ne lister que les exceptions : tout club absent de cette liste
+# s'affiche tel quel tel que trouvé sur coeurdurugby.com.
+club_aliases:
+  "Illkirch Graffenstaden": "CRIG"
+  "Wolxheim": "Mutzig Ovalie Molsheim"  # erreur du site source (R3) : le club s'appelle en réalité Mutzig Ovalie Molsheim
+
 # Une entrée par catégorie à afficher. "slug" sert de nom de fichier de sortie
 # (ex: f2 -> output/f2.html) et doit rester stable (utilisé aussi dans le cache).
 competitions:

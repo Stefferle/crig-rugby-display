@@ -46,6 +46,7 @@ def render_all(config: Config, all_data: list[CompetitionData]) -> None:
             all_competitions=all_competitions,
             data=data,
             team_name=config.team_name,
+            club_aliases=config.club_aliases,
             next_match=next_match,
             updated_at_display=_format_updated_at(data.updated_at),
         )

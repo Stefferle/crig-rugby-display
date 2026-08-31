@@ -2,7 +2,7 @@
 {% block content %}
 
 {% macro club_name(name) -%}
-{{ 'CRIG' if name == team_name else name }}
+{{ club_aliases.get(name, name) }}
 {%- endmacro %}
 
 <div class="match-cards">
