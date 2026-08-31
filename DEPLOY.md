@@ -26,7 +26,7 @@ sudo apt update
 sudo apt install -y python3 python3-venv python3-pip git
 
 # récupération du code
-cd /home/pi
+cd /home/crig
 git clone https://github.com/Stefferle/crig-rugby-display.git
 cd crig-rugby-display
 
@@ -80,7 +80,7 @@ Alternative : ajouter chaque catégorie comme asset séparée (pour gérer la du
 ## 3. Sur le Raspberry Pi — mise à jour lors d'une nouvelle version
 
 ```bash
-cd /home/pi/crig-rugby-display
+cd /home/crig/crig-rugby-display
 git pull
 
 # si requirements.txt a changé

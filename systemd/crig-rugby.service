@@ -5,9 +5,9 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/crig-rugby-display
-ExecStart=/home/pi/crig-rugby-display/.venv/bin/python -m crig_rugby run
+User=crig
+WorkingDirectory=/home/crig/crig-rugby-display
+ExecStart=/home/crig/crig-rugby-display/.venv/bin/python -m crig_rugby run
 Restart=on-failure
 RestartSec=10
 
