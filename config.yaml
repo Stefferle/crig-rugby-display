@@ -25,9 +25,11 @@ server:
   rotation_seconds: 20
 
 schedule:
-  # Week-end : scrape toutes les heures, entre ces deux heures (bornes incluses)
-  weekend_hourly_start: 7
-  weekend_hourly_end: 22
+  # Week-end : scrape toutes les `weekend_interval_minutes` minutes, entre ces
+  # deux heures (bornes incluses)
+  weekend_start: 10
+  weekend_end: 20
+  weekend_interval_minutes: 10
   # Semaine (lun-ven) : une seule fois par jour, à cette heure
   weekday_daily_hour: 7
 

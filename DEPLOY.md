@@ -37,8 +37,21 @@ python3 -m venv .venv
 
 # test manuel avant d'automatiser
 .venv/bin/python -m crig_rugby run
-# → vérifier http://localhost:8090/ puis Ctrl+C
 ```
+
+Le Pi n'a pas d'interface graphique locale (accès en SSH) — deux façons de vérifier que ça tourne, dans un autre terminal :
+
+```bash
+# depuis le Pi lui-même : suffisant pour confirmer que le serveur répond
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8090/healthz
+curl -s http://localhost:8090/f2.html | head -30
+
+# depuis un vrai navigateur (PC/téléphone sur le même réseau) : pour juger du rendu visuel
+hostname -I                      # récupère l'IP LAN du Pi
+# puis ouvrir http://<IP-du-Pi>:8090/ dans le navigateur
+```
+
+Ctrl+C sur le Pi pour arrêter le test manuel une fois vérifié.
 
 ### Activer le service systemd
 
@@ -53,6 +66,16 @@ journalctl -u crig-rugby -f      # logs en direct
 ### Brancher sur Anthias
 
 Dans l'interface Anthias, ajouter une asset **"Web Page"** pointant vers `http://localhost:8090/` — le rotateur intégré (`index.html`) gère déjà l'alternance entre les 4 catégories, une seule asset suffit.
+
+Alternative : ajouter chaque catégorie comme asset séparée (pour gérer la durée d'affichage ou l'ordre directement depuis le planning Anthias plutôt que via `rotation_seconds` dans `config.yaml`) :
+
+| Catégorie | URL |
+|---|---|
+| Rotateur (les 4 catégories) | `http://localhost:8090/` |
+| Séniors M - Fédérale 2 | `http://localhost:8090/f2.html` |
+| Séniors M - Fédérale B | `http://localhost:8090/fb.html` |
+| Séniors F - Fédérale 1 | `http://localhost:8090/f1f.html` |
+| Séniors - Régionale 3 | `http://localhost:8090/r3.html` |
 
 ## 3. Sur le Raspberry Pi — mise à jour lors d'une nouvelle version
 

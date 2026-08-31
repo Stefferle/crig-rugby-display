@@ -23,8 +23,9 @@ class Config:
     competitions: list[Competition]
     port: int = 8090
     rotation_seconds: int = 20
-    weekend_hourly_start: int = 7
-    weekend_hourly_end: int = 22
+    weekend_start: int = 7
+    weekend_end: int = 22
+    weekend_interval_minutes: int = 60
     weekday_daily_hour: int = 7
     request_timeout: int = 15
     request_delay_seconds: float = 1.0
@@ -73,8 +74,9 @@ def load_config(path: Path | str | None = None) -> Config:
         competitions=competitions,
         port=server.get("port", 8090),
         rotation_seconds=server.get("rotation_seconds", 20),
-        weekend_hourly_start=schedule.get("weekend_hourly_start", 7),
-        weekend_hourly_end=schedule.get("weekend_hourly_end", 22),
+        weekend_start=schedule.get("weekend_start", 7),
+        weekend_end=schedule.get("weekend_end", 22),
+        weekend_interval_minutes=schedule.get("weekend_interval_minutes", 60),
         weekday_daily_hour=schedule.get("weekday_daily_hour", 7),
         request_timeout=scraping.get("request_timeout", 15),
         request_delay_seconds=scraping.get("request_delay_seconds", 1.0),

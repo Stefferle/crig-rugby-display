@@ -27,11 +27,11 @@ def start_scheduler(config: Config) -> BackgroundScheduler:
         run_scrape_and_render,
         CronTrigger(
             day_of_week="sat,sun",
-            hour=f"{config.weekend_hourly_start}-{config.weekend_hourly_end}",
-            minute=0,
+            hour=f"{config.weekend_start}-{config.weekend_end}",
+            minute=f"*/{config.weekend_interval_minutes}",
         ),
         args=[config],
-        id="weekend-hourly",
+        id="weekend-interval",
         replace_existing=True,
     )
     scheduler.add_job(
@@ -44,9 +44,10 @@ def start_scheduler(config: Config) -> BackgroundScheduler:
 
     scheduler.start()
     logger.info(
-        "Planificateur démarré (week-end %dh-%dh toutes les heures, semaine %dh/jour).",
-        config.weekend_hourly_start,
-        config.weekend_hourly_end,
+        "Planificateur démarré (week-end %dh-%dh toutes les %dmn, semaine %dh/jour).",
+        config.weekend_start,
+        config.weekend_end,
+        config.weekend_interval_minutes,
         config.weekday_daily_hour,
     )
     return scheduler
