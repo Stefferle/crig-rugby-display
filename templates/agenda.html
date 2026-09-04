@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>CRIG Rugby — Prochains matchs</title>
+<meta http-equiv="refresh" content="1800">
+<link rel="stylesheet" href="/static/css/theme.css">
+</head>
+<body>
+
+{% macro club_name(name) -%}
+{{ club_aliases.get(name, name) }}
+{%- endmacro %}
+
+<header class="page-header">
+    <img class="club-logo" src="/static/img/logo-crig.png" alt="{{ team_name }}">
+    <div class="header-titles">
+        <h1 class="category-title">Prochains matchs</h1>
+    </div>
+    <nav class="category-nav">
+        {% for c in all_competitions %}
+        <a href="/{{ c.slug }}.html">{{ c.slug|upper }}</a>
+        {% endfor %}
+        <a href="/agenda.html" class="active">AGENDA</a>
+    </nav>
+</header>
+
+<main class="page-content">
+<section class="agenda-panel">
+    <span class="section-label">Les 5 prochains matchs — toutes catégories</span>
+    {% if agenda %}
+    <ul class="agenda-list">
+        {% for entry in agenda %}
+        <li class="agenda-row">
+            <span class="agenda-category">{{ entry.category_label }}</span>
+            <div class="agenda-opposition">
+                <div class="nm-side">
+                    <span class="team">{{ club_name(entry.match.home_team) }}</span>
+                    {% if entry.match.home_logo %}<img class="next-match-logo" src="{{ entry.match.home_logo }}" alt="">{% endif %}
+                </div>
+                <span class="vs">-</span>
+                <div class="nm-side">
+                    {% if entry.match.away_logo %}<img class="next-match-logo" src="{{ entry.match.away_logo }}" alt="">{% endif %}
+                    <span class="team">{{ club_name(entry.match.away_team) }}</span>
+                </div>
+            </div>
+            <span class="agenda-date">{{ entry.date_display }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty-state">Aucun prochain match programmé pour le moment</p>
+    {% endif %}
+</section>
+</main>
+
+<footer class="page-footer">
+    <span class="credit">Données : coeurdurugby.com</span>
+    {% if any_stale %}
+    <span class="status-badge status-stale">Certaines catégories affichent des données non rafraîchies</span>
+    {% endif %}
+    <span class="updated-at">Dernière mise à jour : {{ updated_at_display }}</span>
+</footer>
+</body>
+</html>
