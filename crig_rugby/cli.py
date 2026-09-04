@@ -44,6 +44,7 @@ def _setup_logging() -> None:
 def cmd_scrape(args: argparse.Namespace) -> None:
     config = load_config(args.config)
     pipeline.scrape_all(config)
+    pipeline.scrape_all_agenda(config)
 
 
 def cmd_generate(args: argparse.Namespace) -> None:
@@ -58,7 +59,8 @@ def cmd_generate(args: argparse.Namespace) -> None:
             f"Pas de cache disponible pour : {', '.join(missing)}. "
             "Lancez d'abord 'scrape'."
         )
-    render.render_all(config, data)
+    agenda_data = pipeline.load_all_agenda_from_cache(config)
+    render.render_all(config, data, agenda_data)
 
 
 def cmd_serve(args: argparse.Namespace) -> None:

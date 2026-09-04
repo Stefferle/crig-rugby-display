@@ -46,3 +46,25 @@ def load(cache_dir: Path, slug: str) -> CompetitionData | None:
         stale=raw.get("stale", False),
         error=raw.get("error"),
     )
+
+
+def _agenda_cache_path(cache_dir: Path, slug: str) -> Path:
+    return cache_dir / f"agenda_{slug}.json"
+
+
+def save_agenda_matches(cache_dir: Path, slug: str, matches: list[Match], updated_at: str) -> None:
+    """Cache dédié à l'agenda multi-catégories : la fiche équipe complète
+    (via `equipe_url`), indépendante du snapshot par catégorie (`save`/`load`
+    ci-dessus) pour ne pas modifier ce qui alimente les pages catégorie."""
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    path = _agenda_cache_path(cache_dir, slug)
+    payload = {"updated_at": updated_at, "matches": [asdict(m) for m in matches]}
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def load_agenda_matches(cache_dir: Path, slug: str) -> tuple[list[Match], str | None] | None:
+    path = _agenda_cache_path(cache_dir, slug)
+    if not path.exists():
+        return None
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    return [Match(**m) for m in raw.get("matches", [])], raw.get("updated_at")

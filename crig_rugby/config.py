@@ -15,6 +15,8 @@ class Competition:
     slug: str
     label: str
     resultats_url: str
+    equipe_url: str
+    heure_habituelle: str | None = None
 
 
 @dataclass
@@ -62,6 +64,8 @@ def load_config(path: Path | str | None = None) -> Config:
             slug=item["slug"],
             label=item["label"],
             resultats_url=item["resultats_url"],
+            equipe_url=item["equipe_url"],
+            heure_habituelle=item.get("heure_habituelle"),
         )
         for item in raw["competitions"]
     ]

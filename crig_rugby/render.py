@@ -9,7 +9,10 @@ from zoneinfo import ZoneInfo
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from .config import Competition, Config
-from .models import CompetitionData
+from .models import CompetitionData, Match
+
+# (matchs à venir, horodatage de la dernière mise à jour, données de repli)
+AgendaEntry = tuple[list[Match], str | None, bool]
 
 _DISPLAY_TZ = ZoneInfo("Europe/Paris")
 
@@ -68,27 +71,33 @@ def _short_category_label(label: str) -> str:
 
 
 def _build_agenda(
-    all_data: list[CompetitionData],
+    agenda_data: dict[str, AgendaEntry],
     competitions_by_slug: dict[str, Competition],
     max_entries: int = 5,
 ) -> list[dict]:
     """Les prochains matchs à venir, toutes catégories confondues, triés
     chronologiquement (peut inclure plusieurs matchs d'une même catégorie si
-    son calendrier est plus rempli que celui des autres). L'ordre domicile /
+    son calendrier est plus rempli que celui des autres). Source : la fiche
+    équipe complète de chaque catégorie (`equipe_url`), pas le classement de
+    poule — donne le calendrier entier même en pré-saison. L'ordre domicile /
     extérieur d'origine est conservé tel quel (pas de normalisation CRIG en
     tête : ce serait faux quand CRIG reçoit à l'extérieur)."""
     entries = []
-    for data in all_data:
-        upcoming = data.calendar if data.calendar else ([data.first_match] if data.first_match else [])
-        competition = competitions_by_slug[data.slug]
+    for slug, (matches, _, _) in agenda_data.items():
+        competition = competitions_by_slug[slug]
+        upcoming = [m for m in matches if not m.played]
         for match in upcoming:
-            sort_key = (_parse_date_label(match.date_label) or date.max, match.heure or "23:59")
+            # La fiche équipe (equipe_url) ne donne pas l'heure du match (seule
+            # la page de poule l'a) : on retombe sur l'heure habituelle de la
+            # catégorie, configurée dans config.yaml.
+            heure = match.heure or competition.heure_habituelle
+            sort_key = (_parse_date_label(match.date_label) or date.max, heure or "23:59")
             entries.append(
                 {
                     "sort_key": sort_key,
                     "category_label": _short_category_label(competition.label),
                     "match": match,
-                    "date_display": _format_agenda_date(match.date_label, match.heure),
+                    "date_display": _format_agenda_date(match.date_label, heure),
                 }
             )
     entries.sort(key=lambda e: e["sort_key"])
@@ -102,7 +111,11 @@ def _make_env(config: Config) -> Environment:
     )
 
 
-def render_all(config: Config, all_data: list[CompetitionData]) -> None:
+def render_all(
+    config: Config,
+    all_data: list[CompetitionData],
+    agenda_data: dict[str, AgendaEntry],
+) -> None:
     env = _make_env(config)
     category_template = env.get_template("category.html")
     rotator_template = env.get_template("rotator.html")
@@ -134,13 +147,13 @@ def render_all(config: Config, all_data: list[CompetitionData]) -> None:
     )
     (config.output_dir / "index.html").write_text(rotator_html, encoding="utf-8")
 
-    updated_ats = [data.updated_at for data in all_data if data.updated_at]
+    agenda_updated_ats = [updated_at for _, updated_at, _ in agenda_data.values() if updated_at]
     agenda_html = agenda_template.render(
         all_competitions=all_competitions,
         team_name=config.team_name,
         club_aliases=config.club_aliases,
-        agenda=_build_agenda(all_data, competitions_by_slug),
-        any_stale=any(data.stale for data in all_data),
-        updated_at_display=_format_updated_at(max(updated_ats) if updated_ats else None),
+        agenda=_build_agenda(agenda_data, competitions_by_slug),
+        any_stale=any(stale for _, _, stale in agenda_data.values()),
+        updated_at_display=_format_updated_at(max(agenda_updated_ats) if agenda_updated_ats else None),
     )
     (config.output_dir / "agenda.html").write_text(agenda_html, encoding="utf-8")

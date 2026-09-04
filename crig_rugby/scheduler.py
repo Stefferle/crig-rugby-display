@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 def run_scrape_and_render(config: Config) -> None:
     logger.info("Scraping de toutes les compétitions...")
     data = pipeline.scrape_all(config)
-    render.render_all(config, data)
+    agenda_data = pipeline.scrape_all_agenda(config)
+    render.render_all(config, data, agenda_data)
     logger.info("Pages régénérées (%d compétitions).", len(data))
 
 

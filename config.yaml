@@ -24,22 +24,35 @@ club_aliases:
 
 # Une entrée par catégorie à afficher. "slug" sert de nom de fichier de sortie
 # (ex: f2 -> output/f2.html) et doit rester stable (utilisé aussi dans le cache).
+# "heure_habituelle" : heure de coup d'envoi par défaut de la catégorie, utilisée
+# uniquement sur la page agenda quand la fiche équipe (equipe_url) ne donne pas
+# l'heure du match (ce champ n'existe que sur la page de la poule, resultats_url).
 competitions:
   - slug: f2
     label: "Séniors M - Fédérale 2 - Poule 2"
     resultats_url: "https://coeurdurugby.com/competitions/federale-2/Qualification/resultats/poule-2"
+    equipe_url: "https://coeurdurugby.com/competitions/federale-2/1/equipe/1583510"
+    heure_habituelle: "15:15"
   - slug: fb
     label: "Séniors M - Fédérale B - Poule 2"
     resultats_url: "https://coeurdurugby.com/competitions/federale-b/Qualification/resultats/poule-2"
+    equipe_url: "https://coeurdurugby.com/competitions/federale-b/1/equipe/1584566"
+    heure_habituelle: "13:30"
   - slug: f1f
     label: "Séniors F - Fédérale 1 - Poule 1"
     resultats_url: "https://coeurdurugby.com/competitions/federale-1-feminine/Qualification/resultats/poule-1"
+    equipe_url: "https://coeurdurugby.com/competitions/federale-1-feminine/1/equipe/1595257"
+    heure_habituelle: "15:00"
   - slug: r3
     label: "Séniors - Régionale 3 - Poule 2"
     resultats_url: "https://coeurdurugby.com/competitions/regionale-3-grand-est/Qualification/resultats/poule-2"
+    equipe_url: "https://coeurdurugby.com/competitions/regionale-3-grand-est/1/equipe/1576278"
+    heure_habituelle: "15:00"
   - slug: u18
     label: "Juniors Nationaux U18 - Poule 2"
     resultats_url: "https://coeurdurugby.com/competitions/juniors-nationaux/Qualification/resultats/poule-2"
+    equipe_url: "https://coeurdurugby.com/competitions/juniors-nationaux/1/equipe/1604336"
+    heure_habituelle: "16:00"
 
 server:
   port: 8090
