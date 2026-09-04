@@ -16,7 +16,7 @@ import logging.handlers
 import time
 from pathlib import Path
 
-from . import cache, pipeline, render
+from . import pipeline, render
 from .config import BASE_DIR, load_config
 from .scheduler import run_scrape_and_render, start_scheduler
 from .server import run_server
@@ -49,10 +49,7 @@ def cmd_scrape(args: argparse.Namespace) -> None:
 
 def cmd_generate(args: argparse.Namespace) -> None:
     config = load_config(args.config)
-    data = [
-        cache.load(config.cache_dir, comp.slug)
-        for comp in config.competitions
-    ]
+    data = pipeline.load_all_from_cache(config)
     missing = [comp.slug for comp, d in zip(config.competitions, data) if d is None]
     if missing:
         raise SystemExit(

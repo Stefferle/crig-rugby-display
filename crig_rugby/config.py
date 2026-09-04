@@ -53,6 +53,10 @@ class Config:
     def static_dir(self) -> Path:
         return BASE_DIR / "static"
 
+    @property
+    def overrides_path(self) -> Path:
+        return BASE_DIR / "overrides.yaml"
+
 
 def load_config(path: Path | str | None = None) -> Config:
     config_path = Path(path) if path else BASE_DIR / "config.yaml"

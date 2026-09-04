@@ -1,0 +1,36 @@
+# Corrections manuelles de date/heure pour un match à venir.
+#
+# À utiliser quand coeurdurugby.com n'a pas (encore) répercuté un changement
+# de programmation (ex: match avancé au samedi soir). Une entrée par match à
+# corriger. Pris en compte au prochain scrape ET au prochain `generate` (pas
+# besoin de redémarrer le service) ; à retirer une fois que le site est à jour.
+#
+# - slug : la catégorie concernée (même valeur que dans config.yaml)
+# - home_team / away_team : noms EXACTS tels que scrapés sur coeurdurugby.com
+#   (avant application de club_aliases), dans l'ordre domicile/extérieur
+#   d'origine du site — celui-ci ne change pas même si la date change
+# - date_label : la date corrigée, au même format que le site
+#   (ex: "samedi 12 septembre 2026")
+# - heure : l'heure corrigée (ex: "20:00") ; à omettre si seule la date change
+#
+# Exemple (match F2 Villefranche-Illkirch avancé au samedi soir) :
+#
+# overrides:
+#   - slug: f2
+#     home_team: "Villefranche Sur Saone"
+#     away_team: "Illkirch Graffenstaden"
+#     date_label: "samedi 12 septembre 2026"
+#     heure: "20:00"
+
+overrides:
+  # - slug: f2
+  #   home_team: "Villefranche Sur Saone"
+  #   away_team: "Illkirch Graffenstaden"
+  #   date_label: "samedi 12 septembre 2026"
+  #   heure: "20:00"
+
+  # - slug: fb
+  #   home_team: "Villefranche Sur Saone"
+  #   away_team: "Illkirch Graffenstaden"
+  #   date_label: "samedi 12 septembre 2026"
+  #   heure: "18:45"
