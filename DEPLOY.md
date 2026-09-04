@@ -65,17 +65,18 @@ journalctl -u crig-rugby -f      # logs en direct
 
 ### Brancher sur Anthias
 
-Dans l'interface Anthias, ajouter une asset **"Web Page"** pointant vers `http://localhost:8090/` — le rotateur intégré (`index.html`) gère déjà l'alternance entre les 4 catégories, une seule asset suffit.
+Dans l'interface Anthias, ajouter une asset **"Web Page"** pointant vers `http://localhost:8090/` — le rotateur intégré (`index.html`) gère déjà l'alternance entre les 5 catégories, une seule asset suffit.
 
 Alternative : ajouter chaque catégorie comme asset séparée (pour gérer la durée d'affichage ou l'ordre directement depuis le planning Anthias plutôt que via `rotation_seconds` dans `config.yaml`) :
 
 | Catégorie | URL |
 |---|---|
-| Rotateur (les 4 catégories) | `http://localhost:8090/` |
+| Rotateur (les 5 catégories) | `http://localhost:8090/` |
 | Séniors M - Fédérale 2 | `http://localhost:8090/f2.html` |
 | Séniors M - Fédérale B | `http://localhost:8090/fb.html` |
 | Séniors F - Fédérale 1 | `http://localhost:8090/f1f.html` |
 | Séniors - Régionale 3 | `http://localhost:8090/r3.html` |
+| Juniors Nationaux U18 | `http://localhost:8090/u18.html` |
 
 ## 3. Sur le Raspberry Pi — mise à jour lors d'une nouvelle version
 

@@ -37,6 +37,9 @@ competitions:
   - slug: r3
     label: "Séniors - Régionale 3 - Poule 2"
     resultats_url: "https://coeurdurugby.com/competitions/regionale-3-grand-est/Qualification/resultats/poule-2"
+  - slug: u18
+    label: "Juniors Nationaux U18 - Poule 2"
+    resultats_url: "https://coeurdurugby.com/competitions/juniors-nationaux/Qualification/resultats/poule-2"
 
 server:
   port: 8090
