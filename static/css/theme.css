@@ -62,8 +62,12 @@
 }
 
 html {
-  /* Design pensé pour un écran 1920x1080 : 1rem = 1% de la largeur d'écran. */
-  font-size: 1vw;
+  /* Design pensé pour un écran 1920x1080 : 1rem = 1% de la largeur d'écran.
+     Levier UNIQUE pour la taille de tout le contenu (texte, logos, marges) :
+     augmenter cette valeur grossit l'ensemble de l'affichage en conservant
+     ses proportions — utile pour la lisibilité sur un écran dynamique vu à
+     distance. */
+  font-size: 1.15vw;
 }
 
 body {
@@ -92,15 +96,15 @@ h1, h2 {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 2rem;
-  padding: 2rem 4rem 2rem 3rem;
-  min-height: 14rem;
+  gap: 1.32rem;
+  padding: 1.32rem 2.64rem 1.32rem 1.98rem;
+  min-height: 9.24rem;
   background: linear-gradient(100deg, var(--color-accent) 0%, var(--color-accent) 62%, var(--color-accent-dark) 100%);
   clip-path: polygon(0 0, 100% 0, 100% 74%, 0 100%);
 }
 
 .club-logo {
-  height: 9.5rem;
+  height: 6.27rem;
   width: auto;
   filter: drop-shadow(0 0.3rem 0.6rem rgba(0, 0, 0, 0.45));
 }
@@ -108,13 +112,13 @@ h1, h2 {
 .header-titles {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.2rem;
 }
 
 .category-title {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 2.7rem;
+  font-size: 1.78rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: #1a1010;
@@ -124,7 +128,7 @@ h1, h2 {
 .category-nav {
   margin-left: auto;
   display: flex;
-  gap: 0.8rem;
+  gap: 0.53rem;
 }
 
 .category-nav a {
@@ -132,10 +136,10 @@ h1, h2 {
   text-decoration: none;
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 1.2rem;
-  padding: 0.5rem 1.1rem;
+  font-size: 0.79rem;
+  padding: 0.33rem 0.73rem;
   border-radius: 0.4rem;
-  border: 0.06rem solid rgba(20, 10, 10, 0.3);
+  border: 0.04rem solid rgba(20, 10, 10, 0.3);
 }
 
 .category-nav a.active {
@@ -267,7 +271,6 @@ h1, h2 {
   flex: 1;
   display: flex;
   gap: 1.5rem;
-  margin-top: 0.8rem;
   min-height: 0;
 }
 
@@ -284,18 +287,6 @@ h1, h2 {
   font-size: 1.35rem;
 }
 
-.standings-table th {
-  font-family: var(--font-heading);
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  font-weight: 500;
-  font-size: 1.1rem;
-  letter-spacing: 0.03em;
-  text-align: center;
-  padding: 0.4rem 0.3rem;
-  border-bottom: 0.08rem solid var(--color-border);
-}
-
 .standings-table td {
   text-align: center;
   padding: 0.5rem 0.3rem;
@@ -306,7 +297,6 @@ h1, h2 {
   text-align: left;
 }
 
-.standings-table th:last-child,
 .standings-table td:last-child {
   padding-right: 1.6rem;
 }
@@ -325,7 +315,7 @@ h1, h2 {
 
 .match-list {
   list-style: none;
-  margin: 0.8rem 0 0;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -364,11 +354,10 @@ h1, h2 {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
-  gap: 2rem 3rem;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2rem 1.5rem;
+  width: 100%;
   max-width: 90%;
 }
 
@@ -377,7 +366,6 @@ h1, h2 {
   flex-direction: column;
   align-items: center;
   gap: 0.6rem;
-  width: 11rem;
   font-size: 1.4rem;
   text-align: center;
 }

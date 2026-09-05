@@ -9,18 +9,21 @@ team_name: "Illkirch Graffenstaden"
 # s'affiche tel quel tel que trouvé sur coeurdurugby.com.
 club_aliases:
   "Illkirch Graffenstaden": "CRIG"
-  "Wolxheim": "Mutzig Ovalie Molsheim"  # erreur du site source (R3) : le club s'appelle en réalité Mutzig Ovalie Molsheim
+  "Wolxheim": "MOM"  # erreur du site source (R3) : le club s'appelle en réalité Mutzig Ovalie Molsheim
   "Selestat": "Sélestat"
-  "Villefranche Sur Saone": "Villefranche-sur-Saône"
-  "Lons Le Saunier": "Lons-le-Saunier"
-  "Chalon sur Saône": "Chalon-sur-Saône"
-  "Andrezieux Bouthéon": "Andrézieux-Bouthéon"
+  "Villefranche Sur Saone": "CS Villefranche"
+  "Lons Le Saunier": "CS Ledonien"
+  "Chalon sur Saône": "Chalon/Saône"
+  "Andrezieux Bouthéon": "RCAB"
   "Saint Dié": "Saint-Dié"
   "Bourgoin Jallieu": "Bourgoin-Jallieu"
-  "Grenoble UC - Saint Martin D'heres": "Grenoble UC - Saint Martin d'Hères"
-  "Saint Jean De Bournay": "Saint-Jean-de-Bournay"
+  "Grenoble UC - Saint Martin D'heres": "Grenoble UC"
+  "Saint Jean De Bournay": "RCSJ"
   "Rillieux La Pape": "Rillieux-la-Pape"
-  "Saint Claude": "Saint-Claude"
+  "Saint Claude": "FC San Claudien"
+  "Paris Université Club": "PUC"
+  "Strasbourg": "SAR-MOM"
+
 
 # Une entrée par catégorie à afficher. "slug" sert de nom de fichier de sortie
 # (ex: f2 -> output/f2.html) et doit rester stable (utilisé aussi dans le cache).

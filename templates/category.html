@@ -50,7 +50,8 @@
 {% if data.engaged_clubs and not data.standings and not data.results and not data.calendar %}
 <section class="engaged-clubs-panel">
     <span class="section-label">Clubs de la poule</span>
-    <ul class="engaged-clubs-list">
+    {% set columns = (data.engaged_clubs|length + 1) // 2 %}
+    <ul class="engaged-clubs-list" style="grid-template-columns: repeat({{ columns }}, 1fr);">
         {% for club in data.engaged_clubs %}
         <li class="{{ 'crig-row' if club.name == team_name else '' }}">
             {% if club.logo_url %}<img class="club-logo-small" src="{{ club.logo_url }}" alt="">{% endif %}
@@ -62,21 +63,12 @@
 {% else %}
 <div class="content-columns">
     <section class="standings-panel">
-        <span class="section-label">Classement</span>
         {% if data.standings %}
         {% set half = (data.standings|length + 1) // 2 %}
         <div class="standings-columns">
             {% for group in [data.standings[:half], data.standings[half:]] %}
             {% if not loop.first %}<div class="standings-divider"></div>{% endif %}
             <table class="standings-table">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th></th>
-                    <th>Équipe</th>
-                    <th>Points</th>
-                </tr>
-                </thead>
                 <tbody>
                 {% for row in group %}
                 <tr class="{{ 'crig-row' if row.is_crig else '' }}">
@@ -96,10 +88,9 @@
     </section>
 
     <section class="calendar-panel">
-        <span class="section-label">Calendrier à venir</span>
         {% if data.calendar[1:] %}
         <ul class="match-list">
-            {% for m in data.calendar[1:7] %}
+            {% for m in data.calendar[1:6] %}
             <li>
                 <span class="match-date">{{ m.date_label }}{% if m.journee %} ({{ m.journee }}){% endif %}</span>
                 <span class="team">{{ club_name(m.home_team) }}</span>
