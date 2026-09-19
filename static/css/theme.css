@@ -469,16 +469,12 @@ h1, h2 {
   font-variant-numeric: tabular-nums;
 }
 
-.agenda-date-single {
-  font-size: 1.3rem;
-}
-
 .agenda-date-day {
   font-size: 1.3rem;
 }
 
 .agenda-date-time {
-  font-size: 1.05rem;
+  font-size: 1.2rem;
 }
 
 /* ---------- Footer ---------- */
