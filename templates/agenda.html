@@ -32,7 +32,9 @@
     <ul class="agenda-list">
         {% for entry in agenda %}
         <li class="agenda-row">
-            <span class="agenda-category">{{ entry.category_label }}</span>
+            <span class="agenda-category">
+                {% for slot in entry.slots %}{{ slot.category_label }}{% if not loop.last %} / {% endif %}{% endfor %}
+            </span>
             <div class="agenda-opposition">
                 <div class="nm-side">
                     <span class="team">{{ club_name(entry.match.home_team) }}</span>
@@ -44,7 +46,16 @@
                     <span class="team">{{ club_name(entry.match.away_team) }}</span>
                 </div>
             </div>
-            <span class="agenda-date">{{ entry.date_display }}</span>
+            <div class="agenda-date">
+                {% if entry.slots|length > 1 %}
+                <span class="agenda-date-day">{{ entry.date_only_display }}</span>
+                {% for slot in entry.slots %}
+                <span class="agenda-date-time">{% if slot.heure %}{{ slot.heure }} · {% endif %}{{ slot.category_label }}</span>
+                {% endfor %}
+                {% else %}
+                <span class="agenda-date-single">{{ entry.date_only_display }}{% if entry.slots[0].heure %} — {{ entry.slots[0].heure }}{% endif %}</span>
+                {% endif %}
+            </div>
         </li>
         {% endfor %}
     </ul>

@@ -460,11 +460,26 @@ h1, h2 {
 
 .agenda-date {
   justify-self: end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
   text-align: right;
   color: var(--color-text-muted);
-  font-size: 1.3rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.agenda-date-single {
+  font-size: 1.3rem;
+}
+
+.agenda-date-day {
+  font-size: 1.3rem;
+}
+
+.agenda-date-time {
+  font-size: 1.05rem;
 }
 
 /* ---------- Footer ---------- */

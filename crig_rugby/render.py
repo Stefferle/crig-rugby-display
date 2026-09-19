@@ -81,7 +81,12 @@ def _build_agenda(
     équipe complète de chaque catégorie (`equipe_url`), pas le classement de
     poule — donne le calendrier entier même en pré-saison. L'ordre domicile /
     extérieur d'origine est conservé tel quel (pas de normalisation CRIG en
-    tête : ce serait faux quand CRIG reçoit à l'extérieur)."""
+    tête : ce serait faux quand CRIG reçoit à l'extérieur).
+
+    Deux catégories (typiquement F2 et FB) affrontent souvent le même
+    adversaire le même jour ("doublette") : ces entrées sont regroupées en
+    une seule ligne listant chaque catégorie avec son horaire, plutôt que
+    dupliquer la même opposition sur deux lignes."""
     entries = []
     for slug, (matches, _, _) in agenda_data.items():
         competition = competitions_by_slug[slug]
@@ -91,17 +96,36 @@ def _build_agenda(
             # la page de poule l'a) : on retombe sur l'heure habituelle de la
             # catégorie, configurée dans config.yaml.
             heure = match.heure or competition.heure_habituelle
-            sort_key = (_parse_date_label(match.date_label) or date.max, heure or "23:59")
+            match_date = _parse_date_label(match.date_label) or date.max
             entries.append(
                 {
-                    "sort_key": sort_key,
+                    "sort_key": (match_date, heure or "23:59"),
+                    "match_date": match_date,
                     "category_label": _short_category_label(competition.label),
                     "match": match,
-                    "date_display": _format_agenda_date(match.date_label, heure),
+                    "heure": heure,
+                    "date_only_display": _format_agenda_date(match.date_label, None),
                 }
             )
     entries.sort(key=lambda e: e["sort_key"])
-    return entries[:max_entries]
+
+    grouped: list[dict] = []
+    group_by_key: dict[tuple, dict] = {}
+    for entry in entries:
+        key = (entry["match_date"], entry["match"].home_team, entry["match"].away_team)
+        group = group_by_key.get(key)
+        if group is None:
+            group = {
+                "sort_key": entry["sort_key"],
+                "match": entry["match"],
+                "date_only_display": entry["date_only_display"],
+                "slots": [],
+            }
+            group_by_key[key] = group
+            grouped.append(group)
+        group["slots"].append({"category_label": entry["category_label"], "heure": entry["heure"]})
+
+    return grouped[:max_entries]
 
 
 def _make_env(config: Config) -> Environment:
