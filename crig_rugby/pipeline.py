@@ -38,10 +38,16 @@ def scrape_competition(
         classement_html = fetch_html(classement_url, config)
         standings, team_page_url = parse_standings(classement_html, config.team_name)
 
-        if not standings:
-            # Saison pas encore commencée : classement vide sur le site. On
-            # affiche à la place les clubs engagés et le premier match, tirés
-            # de la page résultats (voir docstring de `parse_poule_preview`).
+        # Selon la compétition, coeurdurugby.com représente une saison pas
+        # encore commencée de deux façons différentes : tableau vide (aucune
+        # ligne, ex. Fédérale 2) ou tableau prérempli avec toutes les équipes
+        # à 0 partout (ex. Top 14, Juniors U18 — voir test_parse_standings_
+        # prefilled_table). Dans les deux cas, personne n'a encore joué.
+        season_not_started = not standings or all(row.played == "0" for row in standings)
+
+        if season_not_started:
+            # On affiche à la place les clubs engagés et le premier match,
+            # tirés de la page résultats (voir docstring de `parse_poule_preview`).
             engaged_clubs, first_match = parse_poule_preview(resultats_html, config.team_name)
             data = CompetitionData(
                 slug=competition.slug,
