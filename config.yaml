@@ -23,7 +23,10 @@ club_aliases:
   "Saint Claude": "FC San Claudien"
   "Paris Université Club": "PUC"
   "Strasbourg": "SAR-MOM"
-
+  "LES PUNCHEUSES FED1 F+18 à XV (20262720010082RST)": "REEL - Bron"
+  "DRUSUS HASPARTUM RUGBY(20262720060003RST)": "Drusenheim"
+  "ENTENTE MARNE RUGBY U18 (20262720060016R)": "Entente Marne"
+  "ENTENTE MARNE RUGBY U18 (20262720060016R": "Entente Marne"
 
 # Une entrée par catégorie à afficher. "slug" sert de nom de fichier de sortie
 # (ex: f2 -> output/f2.html) et doit rester stable (utilisé aussi dans le cache).

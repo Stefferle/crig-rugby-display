@@ -67,7 +67,7 @@ html {
      augmenter cette valeur grossit l'ensemble de l'affichage en conservant
      ses proportions — utile pour la lisibilité sur un écran dynamique vu à
      distance. */
-  font-size: 1.15vw;
+  font-size: 1.05vw;
 }
 
 body {
