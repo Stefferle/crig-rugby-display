@@ -49,9 +49,7 @@
             <div class="agenda-date">
                 {% if entry.slots|length > 1 %}
                 <span class="agenda-date-day">{{ entry.date_only_display }}</span>
-                {% for slot in entry.slots %}
-                <span class="agenda-date-time">{% if slot.heure %}{{ slot.heure }} · {% endif %}{{ slot.category_label }}</span>
-                {% endfor %}
+                <span class="agenda-date-time">{% for slot in entry.slots %}{{ slot.heure }}{% if not loop.last %} / {% endif %}{% endfor %}</span>
                 {% else %}
                 <span class="agenda-date-single">{{ entry.date_only_display }}{% if entry.slots[0].heure %} — {{ entry.slots[0].heure }}{% endif %}</span>
                 {% endif %}
