@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from .config import Competition, Config
+from .dates import DATE_LABEL_RE, parse_date_label
 from .models import CompetitionData, Match
 
 # (matchs à venir, horodatage de la dernière mise à jour, données de repli)
@@ -16,12 +17,6 @@ AgendaEntry = tuple[list[Match], str | None, bool]
 
 _DISPLAY_TZ = ZoneInfo("Europe/Paris")
 
-_MOIS_FR = {
-    "janvier": 1, "février": 2, "mars": 3, "avril": 4, "mai": 5, "juin": 6,
-    "juillet": 7, "août": 8, "septembre": 9, "octobre": 10, "novembre": 11,
-    "décembre": 12,
-}
-_DATE_LABEL_RE = re.compile(r"^(\w+)?\s*(\d{1,2})\s+(\w+)\s+(\d{4})")
 _POULE_SUFFIX_RE = re.compile(r"\s*-\s*Poule\s+\S+$", re.IGNORECASE)
 
 
@@ -35,25 +30,11 @@ def _format_updated_at(updated_at: str | None) -> str:
     return dt.astimezone(_DISPLAY_TZ).strftime("%d/%m/%Y à %H:%M")
 
 
-def _parse_date_label(date_label: str) -> date | None:
-    """Reconstruit une date à partir d'un libellé français (ex: "samedi 26
-    septembre 2026"). Le site source ne fournit pas de date machine-readable
-    (pas d'attribut `datetime` sur les <time>)."""
-    match = _DATE_LABEL_RE.match(date_label)
-    if not match:
-        return None
-    _, day, month_name, year = match.groups()
-    month = _MOIS_FR.get(month_name.lower())
-    if month is None:
-        return None
-    return date(int(year), month, int(day))
-
-
 def _format_agenda_date(date_label: str, heure: str | None) -> str:
     """Reformate un libellé français ("samedi 26 septembre 2026") en
     "samedi 26/09/2026", complété par l'heure si connue."""
-    match = _DATE_LABEL_RE.match(date_label)
-    parsed = _parse_date_label(date_label)
+    match = DATE_LABEL_RE.match(date_label)
+    parsed = parse_date_label(date_label)
     if match is None or parsed is None:
         formatted = date_label
     else:
@@ -96,7 +77,7 @@ def _build_agenda(
             # la page de poule l'a) : on retombe sur l'heure habituelle de la
             # catégorie, configurée dans config.yaml.
             heure = match.heure or competition.heure_habituelle
-            match_date = _parse_date_label(match.date_label) or date.max
+            match_date = parse_date_label(match.date_label) or date.max
             entries.append(
                 {
                     "sort_key": (match_date, heure or "23:59"),

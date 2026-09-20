@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from . import cache
 from .config import Competition, Config
+from .dates import parse_date_label
 from .models import CompetitionData, Match
 from .overrides import MatchOverride, apply_overrides, load_overrides
 from .scraper import (
@@ -70,6 +71,10 @@ def scrape_competition(
 
         team_html = fetch_html(team_page_url, config)
         results, upcoming = parse_team_page(team_html)
+        # Le site liste les résultats du plus récent au plus ancien ; on les
+        # trie par date croissante pour que `results[-1]` (le plus récent,
+        # utilisé pour le bandeau "Dernier résultat") soit toujours correct.
+        results.sort(key=lambda m: parse_date_label(m.date_label) or date.min)
 
         data = CompetitionData(
             slug=competition.slug,
