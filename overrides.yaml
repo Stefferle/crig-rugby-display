@@ -20,25 +20,25 @@
 overrides:
    - slug: fb
      home_team: "Illkirch Graffenstaden"
-     away_team: "Andrézieux-Bouthéon"
+     away_team: "Andrezieux Bouthéon"
      date_label: "dimanche 11 octobre 2026"
      heure: "13:00"
 
    - slug: f2
      home_team: "Illkirch Graffenstaden"
-     away_team: "Andrézieux-Bouthéon"
+     away_team: "Andrezieux Bouthéon"
      date_label: "dimanche 11 octobre 2026"
      heure: "14:45"
 
    - slug: fb
      home_team: "Illkirch Graffenstaden"
-     away_team: "Rillieux-la-Pape"
+     away_team: "Rillieux La Pape"
      date_label: "samedi 24 octobre 2026"
      heure: "18:30"
 
    - slug: f2
      home_team: "Illkirch Graffenstaden"
-     away_team: "Rillieux-la-Pape"
+     away_team: "Rillieux La Pape"
      date_label: "samedi 24 octobre 2026"
      heure: "20:00"
 
