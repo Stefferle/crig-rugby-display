@@ -16,18 +16,32 @@
 # Exemple (match F2 Villefranche-Illkirch avancé au samedi soir) :
 #
 # overrides:
-#   - slug: f2
-#     home_team: "Villefranche Sur Saone"
-#     away_team: "Illkirch Graffenstaden"
-#     date_label: "samedi 12 septembre 2026"
-#     heure: "20:00"
 
 overrides:
-  # - slug: f2
-  #   home_team: "Villefranche Sur Saone"
-  #   away_team: "Illkirch Graffenstaden"
-  #   date_label: "samedi 12 septembre 2026"
-  #   heure: "20:00"
+   - slug: fb
+     home_team: "Illkirch Graffenstaden"
+     away_team: "Andrézieux-Bouthéon"
+     date_label: "dimanche 11 octobre 2026"
+     heure: "13:00"
+
+   - slug: f2
+     home_team: "Illkirch Graffenstaden"
+     away_team: "Andrézieux-Bouthéon"
+     date_label: "dimanche 11 octobre 2026"
+     heure: "14:45"
+
+   - slug: fb
+     home_team: "Illkirch Graffenstaden"
+     away_team: "Rillieux-la-Pape"
+     date_label: "samedi 24 octobre 2026"
+     heure: "18:30"
+
+   - slug: f2
+     home_team: "Illkirch Graffenstaden"
+     away_team: "Rillieux-la-Pape"
+     date_label: "samedi 24 octobre 2026"
+     heure: "20:00"
+
 
   # - slug: fb
   #   home_team: "Villefranche Sur Saone"
