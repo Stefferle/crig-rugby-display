@@ -1,8 +1,11 @@
 """Tests de parsing sur des pages réelles de coeurdurugby.com (figées en fixtures).
 
-Ces fixtures ont été téléchargées le 31/08/2026, avant le début de la saison
-2026-2027 (13/09/2026) : aucun match n'y est encore joué. Les scores ne sont
-donc pas couverts ici — à compléter dès que de vrais résultats existent.
+La plupart de ces fixtures ont été téléchargées le 31/08/2026, avant le début
+de la saison 2026-2027 (13/09/2026) : aucun match n'y est encore joué.
+`federale2_equipe_crig.html` a été rafraîchie le 12/10/2026 (saison en cours,
+J1 à J4 joués) après que le site a changé la structure de la fiche équipe
+(classes `eqL`/`eqR` + `score-home`/`score-away`, comme la page de poule, au
+lieu de l'ancien `team_left`/`team_right`).
 """
 
 from pathlib import Path
@@ -76,12 +79,23 @@ def test_parse_team_page_calendar():
     html = _read("federale2_equipe_crig.html")
     results, calendar = parse_team_page(html)
 
-    assert results == []  # saison pas commencée
-    assert len(calendar) == 21
+    assert len(results) == 4
+    assert len(calendar) == 18
 
-    first = calendar[0]
-    assert first.journee == "J1"
-    assert "13 septembre 2026" in first.date_label
-    assert first.home_team == "Villefranche Sur Saone"
-    assert first.away_team == "Illkirch Graffenstaden"
-    assert first.played is False
+    # Le site liste les résultats du plus récent au plus ancien (voir le tri
+    # explicite par date dans pipeline.py, qui corrige cet ordre avant cache).
+    last_played = results[0]
+    assert last_played.journee == "J4"
+    assert last_played.home_team == "Illkirch Graffenstaden"
+    assert last_played.away_team == "Andrezieux Bouthéon"
+    assert last_played.home_score == "11"
+    assert last_played.away_score == "17"
+    assert last_played.played is True
+
+    first_upcoming = calendar[0]
+    assert first_upcoming.journee == "J5"
+    assert "18 octobre 2026" in first_upcoming.date_label
+    assert first_upcoming.home_team == "Nantua"
+    assert first_upcoming.away_team == "Illkirch Graffenstaden"
+    assert first_upcoming.heure == "15:15"
+    assert first_upcoming.played is False

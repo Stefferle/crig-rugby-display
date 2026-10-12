@@ -186,24 +186,27 @@ def _clean_text(tag) -> str:
     return tag.get_text(" ", strip=True) if tag is not None else ""
 
 
-def _extract_score(span) -> str | None:
-    """Best-effort : cherche un score numérique dans un span équipe.
-
-    Non vérifié sur un vrai match joué (saison pas commencée) — voir le
-    commentaire en tête de module.
-    """
+def _extract_score(span, side: str) -> str | None:
+    """Score d'un côté du match (`side` = "home" ou "away"), porté par
+    `<big class="score-home ...">` / `<big class="score-away ...">` (classes
+    additionnelles possibles, ex. "green"/"bo" pour bonus — sans effet sur le
+    texte extrait)."""
     if span is None:
         return None
-    for tag in span.find_all(["big", "strong", "span"]):
-        text = tag.get_text(strip=True)
-        if text.isdigit():
-            return text
-    return None
+    tag = span.find("big", class_=f"score-{side}")
+    if tag is None:
+        return None
+    return tag.get_text(strip=True) or None
 
 
 def _parse_team_games(section, base: str) -> list[Match]:
+    """Fiche équipe : mêmes classes `eqL`/`eqR` (équipe à gauche/droite) que
+    la page de poule (voir `parse_poule_preview`) pour le nom/logo de chaque
+    équipe — `eqL` est toujours l'équipe à domicile. Le conteneur `<p>` est en
+    revanche `teamGames` pour un match joué (Résultats) et `teamCalendar`
+    pour un match à venir (Calendrier)."""
     matches: list[Match] = []
-    for p in section.find_all("p", class_="teamGames"):
+    for p in section.find_all("p", class_=["teamGames", "teamCalendar"]):
         time_tag = p.find("time", class_="date")
         journee_span = time_tag.find("span") if time_tag else None
         journee = journee_span.get_text(strip=True) if journee_span else None
@@ -214,14 +217,15 @@ def _parse_team_games(section, base: str) -> list[Match]:
         heure_tag = p.find("time", class_="heure")
         heure = heure_tag.get_text(strip=True) if heure_tag else None
 
-        home_span = p.find("span", class_="team_left")
-        away_span = p.find("span", class_="team_right")
+        home_span = p.find("span", class_="eqL")
+        away_span = p.find("span", class_="eqR")
 
         def team_info(span) -> tuple[str, str | None]:
             if span is None:
                 return "?", None
+            link = span.find("a")
+            name = link.get_text(strip=True) if link else "?"
             img = span.find("img")
-            name = img["alt"] if img and img.get("alt") else (span.get_text(strip=True) or "?")
             logo_url = urljoin(base, img["src"]) if img and img.get("src") else None
             return name, logo_url
 
@@ -237,8 +241,8 @@ def _parse_team_games(section, base: str) -> list[Match]:
                 away_team=away_team,
                 home_logo=home_logo,
                 away_logo=away_logo,
-                home_score=_extract_score(home_span),
-                away_score=_extract_score(away_span),
+                home_score=_extract_score(home_span, "home"),
+                away_score=_extract_score(away_span, "away"),
                 played=False,  # ajusté par l'appelant selon la section d'origine
             )
         )
