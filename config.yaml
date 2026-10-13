@@ -28,6 +28,17 @@ club_aliases:
   "ENTENTE MARNE RUGBY U18 (20262720060016R)": "Entente Marne"
   "ENTENTE MARNE RUGBY U18 (20262720060016R": "Entente Marne"
 
+# Remplacement du logo d'un club à l'affichage (même principe que
+# club_aliases ci-dessus : clé = nom exact tel que trouvé sur
+# coeurdurugby.com, ne lister que les exceptions). Utile quand le site
+# n'a pas de logo propre pour ce club (il retombe sur une icône générique
+# "logo.webp", ex. Sarreguemines et Wolxheim en R3).
+# Valeur = n'importe quelle URL d'image : soit un fichier déposé dans
+# static/img/logos/ et référencé en "/static/img/logos/<fichier>", soit
+# une URL externe.
+club_logo_overrides:
+  "Wolxheim": "/static/img/logos/logo_mom.png"
+
 # Une entrée par catégorie à afficher. "slug" sert de nom de fichier de sortie
 # (ex: f2 -> output/f2.html) et doit rester stable (utilisé aussi dans le cache).
 # "heure_habituelle" : heure de coup d'envoi par défaut de la catégorie, utilisée

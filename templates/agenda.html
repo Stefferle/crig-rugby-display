@@ -12,6 +12,10 @@
 {{ club_aliases.get(name, name) }}
 {%- endmacro %}
 
+{% macro club_logo(name, scraped_url) -%}
+{{ club_logo_overrides.get(name, scraped_url) }}
+{%- endmacro %}
+
 <header class="page-header">
     <img class="club-logo" src="/static/img/logo-crig.png" alt="{{ team_name }}">
     <div class="header-titles">
@@ -35,14 +39,16 @@
             <span class="agenda-category">
                 {% for slot in entry.slots %}{{ slot.category_label }}{% if not loop.last %} / {% endif %}{% endfor %}
             </span>
+            {% set home_logo = club_logo(entry.match.home_team, entry.match.home_logo) %}
+            {% set away_logo = club_logo(entry.match.away_team, entry.match.away_logo) %}
             <div class="agenda-opposition">
                 <div class="nm-side">
                     <span class="team">{{ club_name(entry.match.home_team) }}</span>
-                    {% if entry.match.home_logo %}<img class="next-match-logo" src="{{ entry.match.home_logo }}" alt="">{% endif %}
+                    {% if home_logo %}<img class="next-match-logo" src="{{ home_logo }}" alt="">{% endif %}
                 </div>
                 <span class="vs">-</span>
                 <div class="nm-side">
-                    {% if entry.match.away_logo %}<img class="next-match-logo" src="{{ entry.match.away_logo }}" alt="">{% endif %}
+                    {% if away_logo %}<img class="next-match-logo" src="{{ away_logo }}" alt="">{% endif %}
                     <span class="team">{{ club_name(entry.match.away_team) }}</span>
                 </div>
             </div>

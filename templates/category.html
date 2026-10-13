@@ -5,19 +5,25 @@
 {{ club_aliases.get(name, name) }}
 {%- endmacro %}
 
+{% macro club_logo(name, scraped_url) -%}
+{{ club_logo_overrides.get(name, scraped_url) }}
+{%- endmacro %}
+
 <div class="match-cards">
     {% if data.results %}
     {% set last_result = data.results[-1] %}
     <section class="match-card">
         <span class="section-label">Dernier résultat{% if last_result.journee %} — {{ last_result.journee }}{% endif %}</span>
+        {% set home_logo = club_logo(last_result.home_team, last_result.home_logo) %}
+        {% set away_logo = club_logo(last_result.away_team, last_result.away_logo) %}
         <div class="next-match-teams">
             <div class="nm-side">
                 <span class="team">{{ club_name(last_result.home_team) }}</span>
-                {% if last_result.home_logo %}<img class="next-match-logo" src="{{ last_result.home_logo }}" alt="">{% endif %}
+                {% if home_logo %}<img class="next-match-logo" src="{{ home_logo }}" alt="">{% endif %}
             </div>
             <span class="score">{{ last_result.home_score if last_result.home_score is not none else '—' }} - {{ last_result.away_score if last_result.away_score is not none else '—' }}</span>
             <div class="nm-side">
-                {% if last_result.away_logo %}<img class="next-match-logo" src="{{ last_result.away_logo }}" alt="">{% endif %}
+                {% if away_logo %}<img class="next-match-logo" src="{{ away_logo }}" alt="">{% endif %}
                 <span class="team">{{ club_name(last_result.away_team) }}</span>
             </div>
         </div>
@@ -28,14 +34,16 @@
     <section class="match-card">
         {% if next_match %}
         <span class="section-label">Prochain match{% if next_match.journee %} — {{ next_match.journee }}{% endif %}</span>
+        {% set home_logo = club_logo(next_match.home_team, next_match.home_logo) %}
+        {% set away_logo = club_logo(next_match.away_team, next_match.away_logo) %}
         <div class="next-match-teams">
             <div class="nm-side">
                 <span class="team">{{ club_name(next_match.home_team) }}</span>
-                {% if next_match.home_logo %}<img class="next-match-logo" src="{{ next_match.home_logo }}" alt="">{% endif %}
+                {% if home_logo %}<img class="next-match-logo" src="{{ home_logo }}" alt="">{% endif %}
             </div>
             <span class="vs">-</span>
             <div class="nm-side">
-                {% if next_match.away_logo %}<img class="next-match-logo" src="{{ next_match.away_logo }}" alt="">{% endif %}
+                {% if away_logo %}<img class="next-match-logo" src="{{ away_logo }}" alt="">{% endif %}
                 <span class="team">{{ club_name(next_match.away_team) }}</span>
             </div>
         </div>
@@ -53,8 +61,9 @@
     {% set columns = (data.engaged_clubs|length + 1) // 2 %}
     <ul class="engaged-clubs-list" style="grid-template-columns: repeat({{ columns }}, 1fr);">
         {% for club in data.engaged_clubs %}
+        {% set logo_url = club_logo(club.name, club.logo_url) %}
         <li class="{{ 'crig-row' if club.name == team_name else '' }}">
-            {% if club.logo_url %}<img class="club-logo-small" src="{{ club.logo_url }}" alt="">{% endif %}
+            {% if logo_url %}<img class="club-logo-small" src="{{ logo_url }}" alt="">{% endif %}
             <span>{{ club_name(club.name) }}</span>
         </li>
         {% endfor %}
@@ -71,9 +80,10 @@
             <table class="standings-table">
                 <tbody>
                 {% for row in group %}
+                {% set logo_url = club_logo(row.team, row.logo_url) %}
                 <tr class="{{ 'crig-row' if row.is_crig else '' }}">
                     <td>{{ row.rank }}</td>
-                    <td>{% if row.logo_url %}<img class="standings-logo" src="{{ row.logo_url }}" alt="">{% endif %}</td>
+                    <td>{% if logo_url %}<img class="standings-logo" src="{{ logo_url }}" alt="">{% endif %}</td>
                     <td>{{ club_name(row.team) }}</td>
                     <td>{{ row.points }}</td>
                 </tr>

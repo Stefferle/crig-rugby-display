@@ -148,6 +148,7 @@ def render_all(
             data=data,
             team_name=config.team_name,
             club_aliases=config.club_aliases,
+            club_logo_overrides=config.club_logo_overrides,
             next_match=next_match,
             updated_at_display=_format_updated_at(data.updated_at),
         )
@@ -164,6 +165,7 @@ def render_all(
         all_competitions=all_competitions,
         team_name=config.team_name,
         club_aliases=config.club_aliases,
+        club_logo_overrides=config.club_logo_overrides,
         agenda=_build_agenda(agenda_data, competitions_by_slug),
         any_stale=any(stale for _, _, stale in agenda_data.values()),
         updated_at_display=_format_updated_at(max(agenda_updated_ats) if agenda_updated_ats else None),
