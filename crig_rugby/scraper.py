@@ -206,13 +206,21 @@ def _parse_team_games(section, base: str) -> list[Match]:
     revanche `teamGames` pour un match joué (Résultats) et `teamCalendar`
     pour un match à venir (Calendrier)."""
     matches: list[Match] = []
+    current_date = ""
+    current_journee: str | None = None
     for p in section.find_all("p", class_=["teamGames", "teamCalendar"]):
+        # Comme sur la page de poule (voir `parse_poule_preview`), seul le
+        # premier match d'une journée porte la date/le numéro de journée —
+        # les suivants du même <section> les reprennent implicitement.
         time_tag = p.find("time", class_="date")
-        journee_span = time_tag.find("span") if time_tag else None
-        journee = journee_span.get_text(strip=True) if journee_span else None
-        date_label = _clean_text(time_tag)
-        if journee and date_label:
-            date_label = date_label.replace(journee, "").strip()
+        if time_tag is not None:
+            journee_span = time_tag.find("span")
+            current_journee = journee_span.get_text(strip=True) if journee_span else None
+            current_date = _clean_text(time_tag)
+            if current_journee and current_date:
+                current_date = current_date.replace(current_journee, "").strip()
+        date_label = current_date
+        journee = current_journee
 
         heure_tag = p.find("time", class_="heure")
         heure = heure_tag.get_text(strip=True) if heure_tag else None
@@ -247,6 +255,35 @@ def _parse_team_games(section, base: str) -> list[Match]:
             )
         )
     return matches
+
+
+_JOURNEE_SECTION_RE = re.compile(r"^Journée\s+(\d+)$")
+
+
+def parse_poule_recent_results(resultats_html: str, team_name: str) -> list[Match]:
+    """Repli pour un résultat pas encore répercuté sur la fiche équipe
+    (`parse_team_page`) : il arrive qu'une journée jouée reste visible sur la
+    page de poule (dans des sections <h2>Journée N</h2>, distinctes de
+    "Journée en cours"/"Journée suivante" — voir `parse_poule_preview`) sans
+    que la fiche équipe du club suivi ait encore synchronisé le score. Ne
+    retourne que les matchs du club suivi, pour compléter `results` au
+    besoin dans `pipeline.scrape_competition`."""
+    soup = BeautifulSoup(resultats_html, "html.parser")
+    base = _effective_base(soup, BASE_SITE_URL)
+    results: list[Match] = []
+    for section in soup.find_all("section", class_="teamGames"):
+        heading = section.find("h2")
+        title = heading.get_text(strip=True) if heading else ""
+        section_match = _JOURNEE_SECTION_RE.match(title)
+        if not section_match:
+            continue
+        for match in _parse_team_games(section, base):
+            if team_name in (match.home_team, match.away_team):
+                match.played = True
+                if not match.journee:
+                    match.journee = f"J{section_match.group(1)}"
+                results.append(match)
+    return results
 
 
 def parse_team_page(team_html: str) -> tuple[list[Match], list[Match]]:

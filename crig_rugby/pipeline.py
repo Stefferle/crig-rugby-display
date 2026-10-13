@@ -15,6 +15,7 @@ from .scraper import (
     fetch_html,
     find_classement_url,
     parse_poule_preview,
+    parse_poule_recent_results,
     parse_standings,
     parse_team_page,
 )
@@ -71,6 +72,20 @@ def scrape_competition(
 
         team_html = fetch_html(team_page_url, config)
         results, upcoming = parse_team_page(team_html)
+
+        # Repli : une journée jouée peut apparaître sur la page de poule
+        # (déjà récupérée ci-dessus) avant que la fiche équipe n'ait
+        # synchronisé le score (voir docstring de `parse_poule_recent_results`).
+        # Clé (domicile, extérieur) seule : la page de poule ne répète pas la
+        # date sur chaque match d'une section, seul le premier l'a.
+        known = {(m.home_team, m.away_team) for m in results}
+        for extra in parse_poule_recent_results(resultats_html, config.team_name):
+            key = (extra.home_team, extra.away_team)
+            if key not in known:
+                results.append(extra)
+                known.add(key)
+        upcoming = [m for m in upcoming if (m.home_team, m.away_team) not in known]
+
         # Le site liste les résultats du plus récent au plus ancien ; on les
         # trie par date croissante pour que `results[-1]` (le plus récent,
         # utilisé pour le bandeau "Dernier résultat") soit toujours correct.

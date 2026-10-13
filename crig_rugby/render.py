@@ -68,10 +68,17 @@ def _build_agenda(
     adversaire le même jour ("doublette") : ces entrées sont regroupées en
     une seule ligne listant chaque catégorie avec son horaire, plutôt que
     dupliquer la même opposition sur deux lignes."""
+    today = date.today()
     entries = []
     for slug, (matches, _, _) in agenda_data.items():
         competition = competitions_by_slug[slug]
-        upcoming = [m for m in matches if not m.played]
+        # `not m.played` ne suffit pas : la fiche équipe (equipe_url) met
+        # parfois plusieurs jours à synchroniser le score d'une journée
+        # jouée, qui reste alors listée comme à venir avec sa date passée.
+        upcoming = [
+            m for m in matches
+            if not m.played and (parse_date_label(m.date_label) or date.max) >= today
+        ]
         for match in upcoming:
             # La fiche équipe (equipe_url) ne donne pas l'heure du match (seule
             # la page de poule l'a) : on retombe sur l'heure habituelle de la
