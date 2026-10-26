@@ -42,6 +42,17 @@ overrides:
      date_label: "samedi 24 octobre 2026"
      heure: "20:00"
 
+   - slug: fb
+     home_team: "Saint Claude"
+     away_team: "Illkirch Graffenstaden"
+     date_label: "samedi 7 novembre 2026"
+     heure: "14:15"
+
+   - slug: f2
+     home_team: "Saint Claude"
+     away_team: "Illkirch Graffenstaden"
+     date_label: "samedi 7 novembre 2026"
+     heure: "16:00"
 
   # - slug: fb
   #   home_team: "Villefranche Sur Saone"
