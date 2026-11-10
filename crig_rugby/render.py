@@ -51,6 +51,14 @@ def _short_category_label(label: str) -> str:
     return _POULE_SUFFIX_RE.sub("", label)
 
 
+def _is_upcoming(match: Match, today: date) -> bool:
+    """`not match.played` ne suffit pas : la fiche équipe (equipe_url) met
+    parfois plusieurs jours à synchroniser le score d'une journée jouée, et
+    un match non joué (ex. forfait) peut même ne jamais recevoir de score :
+    il reste alors listé comme à venir avec sa date passée."""
+    return not match.played and (parse_date_label(match.date_label) or date.max) >= today
+
+
 def _build_agenda(
     agenda_data: dict[str, AgendaEntry],
     competitions_by_slug: dict[str, Competition],
@@ -72,13 +80,7 @@ def _build_agenda(
     entries = []
     for slug, (matches, _, _) in agenda_data.items():
         competition = competitions_by_slug[slug]
-        # `not m.played` ne suffit pas : la fiche équipe (equipe_url) met
-        # parfois plusieurs jours à synchroniser le score d'une journée
-        # jouée, qui reste alors listée comme à venir avec sa date passée.
-        upcoming = [
-            m for m in matches
-            if not m.played and (parse_date_label(m.date_label) or date.max) >= today
-        ]
+        upcoming = [m for m in matches if _is_upcoming(m, today)]
         for match in upcoming:
             # La fiche équipe (equipe_url) ne donne pas l'heure du match (seule
             # la page de poule l'a) : on retombe sur l'heure habituelle de la
@@ -138,9 +140,11 @@ def render_all(
     competitions_by_slug = {comp.slug: comp for comp in config.competitions}
     all_competitions = config.competitions
 
+    today = date.today()
     for data in all_data:
         competition = competitions_by_slug[data.slug]
-        next_match = data.calendar[0] if data.calendar else data.first_match
+        upcoming = [m for m in data.calendar if _is_upcoming(m, today)]
+        next_match = upcoming[0] if upcoming else data.first_match
 
         html = category_template.render(
             competition=competition,
@@ -150,6 +154,7 @@ def render_all(
             club_aliases=config.club_aliases,
             club_logo_overrides=config.club_logo_overrides,
             next_match=next_match,
+            upcoming=upcoming,
             updated_at_display=_format_updated_at(data.updated_at),
         )
         (config.output_dir / f"{data.slug}.html").write_text(html, encoding="utf-8")

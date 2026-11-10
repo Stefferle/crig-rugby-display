@@ -98,9 +98,9 @@
     </section>
 
     <section class="calendar-panel">
-        {% if data.calendar[1:] %}
+        {% if upcoming[1:] %}
         <ul class="match-list">
-            {% for m in data.calendar[1:6] %}
+            {% for m in upcoming[1:6] %}
             <li>
                 <span class="match-date">{{ m.date_label }}{% if m.journee %} ({{ m.journee }}){% endif %}</span>
                 <span class="team">{{ club_name(m.home_team) }}</span>
