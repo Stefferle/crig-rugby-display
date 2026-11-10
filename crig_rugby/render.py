@@ -59,10 +59,19 @@ def _is_upcoming(match: Match, today: date) -> bool:
     return not match.played and (parse_date_label(match.date_label) or date.max) >= today
 
 
+def _upcoming_and_next(data: CompetitionData, today: date) -> tuple[list[Match], Match | None]:
+    """Matchs à venir d'une catégorie et prochain match affiché. En
+    pré-saison le calendrier est vide : on retombe sur le premier match
+    tiré de la page de poule."""
+    upcoming = [m for m in data.calendar if _is_upcoming(m, today)]
+    return upcoming, upcoming[0] if upcoming else data.first_match
+
+
 def _build_agenda(
     agenda_data: dict[str, AgendaEntry],
     competitions_by_slug: dict[str, Competition],
     max_entries: int = 5,
+    today: date | None = None,
 ) -> list[dict]:
     """Les prochains matchs à venir, toutes catégories confondues, triés
     chronologiquement (peut inclure plusieurs matchs d'une même catégorie si
@@ -76,7 +85,7 @@ def _build_agenda(
     adversaire le même jour ("doublette") : ces entrées sont regroupées en
     une seule ligne listant chaque catégorie avec son horaire, plutôt que
     dupliquer la même opposition sur deux lignes."""
-    today = date.today()
+    today = today or date.today()
     entries = []
     for slug, (matches, _, _) in agenda_data.items():
         competition = competitions_by_slug[slug]
@@ -91,6 +100,7 @@ def _build_agenda(
                 {
                     "sort_key": (match_date, heure or "23:59"),
                     "match_date": match_date,
+                    "slug": slug,
                     "category_label": _short_category_label(competition.label),
                     "match": match,
                     "heure": heure,
@@ -113,7 +123,9 @@ def _build_agenda(
             }
             group_by_key[key] = group
             grouped.append(group)
-        group["slots"].append({"category_label": entry["category_label"], "heure": entry["heure"]})
+        group["slots"].append(
+            {"slug": entry["slug"], "category_label": entry["category_label"], "heure": entry["heure"]}
+        )
 
     return grouped[:max_entries]
 
@@ -143,8 +155,7 @@ def render_all(
     today = date.today()
     for data in all_data:
         competition = competitions_by_slug[data.slug]
-        upcoming = [m for m in data.calendar if _is_upcoming(m, today)]
-        next_match = upcoming[0] if upcoming else data.first_match
+        upcoming, next_match = _upcoming_and_next(data, today)
 
         html = category_template.render(
             competition=competition,
@@ -176,3 +187,8 @@ def render_all(
         updated_at_display=_format_updated_at(max(agenda_updated_ats) if agenda_updated_ats else None),
     )
     (config.output_dir / "agenda.html").write_text(agenda_html, encoding="utf-8")
+
+    # Import local : export.py importe lui-même des fonctions de ce module.
+    from .export import write_export
+
+    write_export(config, all_data, agenda_data)

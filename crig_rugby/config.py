@@ -33,6 +33,9 @@ class Config:
     weekday_daily_hour: int = 7
     request_timeout: int = 15
     request_delay_seconds: float = 1.0
+    # URL publique du serveur, pour rendre absolus les logos en chemin
+    # relatif dans l'export JSON (voir export._absolute_url).
+    export_base_url: str | None = None
     user_agent: str = (
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
         "(KHTML, like Gecko) Chrome/120.0 Safari/537.36 CRIGRugbyDisplay/1.0"
@@ -78,6 +81,7 @@ def load_config(path: Path | str | None = None) -> Config:
     schedule = raw.get("schedule", {})
     server = raw.get("server", {})
     scraping = raw.get("scraping", {})
+    export = raw.get("export") or {}
 
     return Config(
         team_name=raw["team_name"],
@@ -92,4 +96,5 @@ def load_config(path: Path | str | None = None) -> Config:
         weekday_daily_hour=schedule.get("weekday_daily_hour", 7),
         request_timeout=scraping.get("request_timeout", 15),
         request_delay_seconds=scraping.get("request_delay_seconds", 1.0),
+        export_base_url=export.get("public_base_url"),
     )

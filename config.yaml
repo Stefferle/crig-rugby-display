@@ -89,3 +89,10 @@ scraping:
   request_timeout: 15
   # Pause entre deux requêtes HTTP successives, pour rester respectueux envers coeurdurugby.com
   request_delay_seconds: 1.0
+
+export:
+  # URL publique de ce serveur, sans « / » final. Sert à rendre absolus les
+  # logos référencés en chemin relatif (ex. club_logo_overrides) dans
+  # output/api/crig.json, pour qu'un site tiers puisse les afficher. Laisser
+  # vide tant que le serveur n'est pas accessible publiquement.
+  public_base_url:

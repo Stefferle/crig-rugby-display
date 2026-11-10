@@ -11,6 +11,7 @@ Les données sont récupérées sur [coeurdurugby.com](https://coeurdurugby.com)
 | `/` (`index.html`) | Rotateur : fait défiler les pages catégorie (durée réglée par `rotation_seconds`) |
 | `/<slug>.html` | Une page par catégorie (`f2`, `fb`, `f1f`, `r3`, `u18`) : classement, dernier résultat, prochain match. En pré-saison : clubs engagés et premier match |
 | `/agenda.html` | Les 5 prochains matchs toutes catégories confondues ; les « doublettes » (ex. F2 + FB contre le même adversaire le même jour) sont regroupées sur une ligne |
+| `/api/crig.json` | Export JSON des mêmes données, pour un site tiers (ex. WordPress). Format : [docs/export-json.md](docs/export-json.md) |
 | `/healthz` | Contrôle de vie (`{"status": "ok"}`) |
 
 ## Installation (poste de dev)
@@ -45,6 +46,7 @@ Option globale : `--config chemin/vers/config.yaml` (défaut : `./config.yaml`).
 - `server` : `port`, `rotation_seconds`.
 - `schedule` : le week-end, un scrape toutes les `weekend_interval_minutes` entre `weekend_start` et `weekend_end` ; en semaine, un scrape par jour à `weekday_daily_hour` (fuseau Europe/Paris).
 - `scraping` : `request_timeout`, `request_delay_seconds` (pause entre deux requêtes pour ménager le site).
+- `export` : `public_base_url`, URL publique du serveur, pour rendre absolus dans l'export JSON les logos en chemin relatif.
 
 ### `overrides.yaml`
 
@@ -70,6 +72,7 @@ crig_rugby/
   overrides.py  corrections manuelles (overrides.yaml)
   cache.py      persistance JSON dans data/cache/
   render.py     rendu Jinja2 vers output/
+  export.py     export JSON vers output/api/crig.json
   scheduler.py  planification APScheduler
   server.py     serveur Flask
   dates.py      parsing des dates en français
