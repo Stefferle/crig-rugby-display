@@ -17,6 +17,24 @@ class Match:
     played: bool
     home_logo: str | None = None
     away_logo: str | None = None
+    # Vrai si domicile/extérieur ont été permutés par une correction
+    # `inverser` de overrides.yaml (voir `overrides.apply_overrides`).
+    inverted: bool = False
+
+    @property
+    def site_teams(self) -> tuple[str, str]:
+        """(domicile, extérieur) tels que publiés par coeurdurugby.com, avant
+        une éventuelle inversion manuelle."""
+        if self.inverted:
+            return self.away_team, self.home_team
+        return self.home_team, self.away_team
+
+    def invert(self) -> None:
+        """Permute domicile et extérieur (noms, scores, logos)."""
+        self.home_team, self.away_team = self.away_team, self.home_team
+        self.home_score, self.away_score = self.away_score, self.home_score
+        self.home_logo, self.away_logo = self.away_logo, self.home_logo
+        self.inverted = not self.inverted
 
     @property
     def involves_crig(self) -> bool:
