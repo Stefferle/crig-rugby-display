@@ -1,4 +1,4 @@
-"""Corrections manuelles d'un match à venir : date/heure et/ou inversion.
+"""Corrections manuelles d'un match : date/heure, inversion et/ou score.
 
 Sert de filet de sécurité quand coeurdurugby.com n'a pas (encore) répercuté
 un changement de programmation (ex: match avancé au samedi soir, ou match
@@ -27,6 +27,22 @@ class MatchOverride:
     date_label: str | None = None
     heure: str | None = None
     inverser: bool = False
+    # Score forcé (domicile, extérieur), dans l'ordre AFFICHÉ, c.-à-d. après
+    # une éventuelle inversion. Sert quand le site garde l'ordre d'origine
+    # des équipes d'un match inversé mais saisit le score dans l'ordre du
+    # match réellement joué (vu en R3 sur Illkirch-Saverne du 15/11/2026) :
+    # l'inversion permuterait alors un score déjà « à l'endroit ».
+    score: tuple[str, str] | None = None
+
+
+def _parse_score(raw: object) -> tuple[str, str] | None:
+    """« 25-23 » -> ("25", "23"). Les espaces autour du tiret sont tolérés."""
+    if raw is None:
+        return None
+    home, sep, away = str(raw).partition("-")
+    if not sep or not home.strip().isdigit() or not away.strip().isdigit():
+        raise ValueError(f"Score invalide dans overrides.yaml : {raw!r} (attendu ex. \"25-23\")")
+    return home.strip(), away.strip()
 
 
 def load_overrides(path: Path) -> list[MatchOverride]:
@@ -41,6 +57,7 @@ def load_overrides(path: Path) -> list[MatchOverride]:
             date_label=item.get("date_label"),
             heure=item.get("heure"),
             inverser=bool(item.get("inverser", False)),
+            score=_parse_score(item.get("score")),
         )
         for item in raw.get("overrides") or []
     ]
@@ -54,7 +71,9 @@ def apply_overrides(matches: list[Match], slug: str, overrides: list[MatchOverri
     (`Match.site_teams`), pas sur l'ordre affiché : les corrections sont
     réappliquées à chaque `generate` sur des données déjà corrigées en cache,
     et le match retour (B-A) ne doit pas être confondu avec un aller (A-B)
-    déjà inversé. Pour la même raison, l'inversion n'est faite qu'une fois."""
+    déjà inversé. Pour la même raison, l'inversion n'est faite qu'une fois.
+    Le score forcé est appliqué après l'inversion, puisqu'il est exprimé
+    dans l'ordre affiché ; il est idempotent par nature."""
     for match in matches:
         site_teams = match.site_teams
         for override in overrides:
@@ -66,3 +85,6 @@ def apply_overrides(matches: list[Match], slug: str, overrides: list[MatchOverri
                 match.heure = override.heure
             if override.inverser and not match.inverted:
                 match.invert()
+            if override.score is not None:
+                match.home_score, match.away_score = override.score
+                match.played = True

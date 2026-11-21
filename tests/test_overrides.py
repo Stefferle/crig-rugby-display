@@ -105,3 +105,59 @@ def test_load_overrides_optional_fields(tmp_path):
 
     assert inversion.inverser and inversion.date_label is None
     assert not report.inverser and report.date_label == "samedi 7 novembre 2026"
+
+
+def test_score_force_applique_apres_inversion():
+    """Cas réel (R3, 15/11/2026) : le site publie Illkirch-Saverne 23-25
+    mais a saisi le score dans l'ordre réellement joué (Saverne 25-23 chez
+    lui). Le score forcé est exprimé dans l'ordre affiché, après inversion,
+    et reste stable aux passages suivants (`generate`)."""
+    match = _match("Illkirch Graffenstaden", "Saverne", "dimanche 15 novembre 2026")
+    match.home_score, match.away_score, match.played = "25", "23", True
+    override = MatchOverride(
+        slug="r3",
+        home_team="Illkirch Graffenstaden",
+        away_team="Saverne",
+        inverser=True,
+        score=("25", "23"),
+    )
+
+    apply_overrides([match], "r3", [override])
+    apply_overrides([match], "r3", [override])
+
+    assert (match.home_team, match.away_team) == ("Saverne", "Illkirch Graffenstaden")
+    assert (match.home_score, match.away_score) == ("25", "23")
+    assert match.played
+
+
+def test_load_overrides_score(tmp_path):
+    path = tmp_path / "overrides.yaml"
+    path.write_text(
+        "overrides:\n"
+        "  - slug: r3\n"
+        "    home_team: \"Illkirch Graffenstaden\"\n"
+        "    away_team: \"Saverne\"\n"
+        "    score: \"25 - 23\"\n",
+        encoding="utf-8",
+    )
+
+    (override,) = load_overrides(path)
+
+    assert override.score == ("25", "23")
+
+
+def test_load_overrides_score_invalide(tmp_path):
+    import pytest
+
+    path = tmp_path / "overrides.yaml"
+    path.write_text(
+        "overrides:\n"
+        "  - slug: r3\n"
+        "    home_team: \"Illkirch Graffenstaden\"\n"
+        "    away_team: \"Saverne\"\n"
+        "    score: \"25/23\"\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError):
+        load_overrides(path)

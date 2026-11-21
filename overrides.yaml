@@ -16,6 +16,10 @@
 # - heure : l'heure corrigée (ex: "20:00") ; à omettre si elle ne change pas
 # - inverser : true pour permuter domicile et extérieur (le match se joue
 #   chez le club qui devait se déplacer) ; à omettre sinon
+# - score : score forcé, "domicile-extérieur" dans l'ordre AFFICHÉ (donc
+#   après inversion), ex. "25-23". Pour un match inversé dont le site a
+#   saisi le score dans l'ordre réellement joué sans permuter les équipes
+#   (l'inversion donnerait alors le mauvais vainqueur) ; à omettre sinon
 #
 # Exemple (match F2 Villefranche-Illkirch inversé, joué à Illkirch, à 15:00) :
 #
@@ -69,10 +73,13 @@ overrides:
 
    # aller et retour inversés : aller (15/11/2026) joué à Saverne,
    # retour (07/03/2027) joué à Illkirch
+   # Le site garde Illkirch-Saverne 25-23 mais a saisi le score dans
+   # l'ordre réellement joué : Saverne a gagné 25-23 chez lui.
    - slug: r3
      home_team: "Illkirch Graffenstaden"
      away_team: "Saverne"
      inverser: true
+     score: "25-23"
 
    - slug: r3
      home_team: "Saverne"

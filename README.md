@@ -54,6 +54,7 @@ Corrections manuelles pour un match dont la reprogrammation n'apparaît pas enco
 - `date_label` (ex. `"samedi 7 novembre 2026"`) ;
 - `heure` ;
 - `inverser: true` pour un match inversé, joué chez le club qui devait se déplacer. Domicile/extérieur (noms, scores, logos) sont alors permutés à l'affichage. On décrit toujours le match dans l'ordre **avant** inversion. Pour inverser aussi le match retour, il faut lui ajouter sa propre entrée.
+- `score` (ex. `"25-23"`) pour forcer le score, exprimé dans l'ordre **affiché** (donc après inversion). Utile quand le site garde l'ordre d'origine d'un match inversé mais saisit le score dans l'ordre réellement joué : l'inversion seule donnerait alors le mauvais vainqueur. Le classement, lui, reste celui du site.
 
 Le fichier est relu à chaque cycle, donc pas besoin de redémarrer le service. Une fois le site à jour, on retire l'entrée.
 
