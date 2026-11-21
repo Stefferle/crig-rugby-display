@@ -119,3 +119,20 @@ ajustements_points:
    - slug: r3
      equipe: "Illkirch Graffenstaden"
      points: -2
+
+   - slug: r3
+     equipe: "Wolxheim"
+     points: +1
+
+   - slug: r3
+     equipe: "Lauterbourg"
+     points: +1
+
+   - slug: r3
+     equipe: "Saint Dié"
+     points: -2
+
+   - slug: r3
+     equipe: "Saverne"
+     points: +3
+     
