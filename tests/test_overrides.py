@@ -161,3 +161,50 @@ def test_load_overrides_score_invalide(tmp_path):
 
     with pytest.raises(ValueError):
         load_overrides(path)
+
+
+def _row(rank: str, team: str):
+    from crig_rugby.models import StandingRow
+
+    return StandingRow(rank, team, "0", "0", "0", "0", "0", "0", "0", "0")
+
+
+def test_standing_exclusion_removes_team_and_shifts_ranks():
+    from crig_rugby.models import CompetitionData, EngagedClub
+    from crig_rugby.overrides import StandingExclusion, apply_standing_exclusions
+
+    data = CompetitionData(
+        slug="f1f",
+        label="F1F",
+        standings=[_row("1", "Coyotes 94"), _row("2", "Nancy"), _row("3", "Bron"), _row("3", "Besançon")],
+        engaged_clubs=[EngagedClub("Nancy"), EngagedClub("Bron")],
+    )
+    exclusions = [
+        StandingExclusion(slug="f1f", team="Nancy"),
+        StandingExclusion(slug="r3", team="Bron"),  # autre catégorie : ignorée
+    ]
+
+    apply_standing_exclusions(data, exclusions)
+    # réappliqué à chaque `generate` sur le cache déjà corrigé : idempotent
+    apply_standing_exclusions(data, exclusions)
+
+    assert [(r.rank, r.team) for r in data.standings] == [
+        ("1", "Coyotes 94"),
+        ("2", "Bron"),
+        ("2", "Besançon"),
+    ]
+    assert [c.name for c in data.engaged_clubs] == ["Bron"]
+
+
+def test_load_standing_exclusions(tmp_path):
+    from crig_rugby.overrides import StandingExclusion, load_standing_exclusions
+
+    path = tmp_path / "overrides.yaml"
+    path.write_text(
+        'overrides: []\nexclusions_classement:\n  - slug: f1f\n    equipe: "Nancy"\n',
+        encoding="utf-8",
+    )
+    assert load_standing_exclusions(path) == [StandingExclusion(slug="f1f", team="Nancy")]
+    # section absente : aucune exclusion
+    path.write_text("overrides: []\n", encoding="utf-8")
+    assert load_standing_exclusions(path) == []

@@ -9,7 +9,14 @@ from . import cache
 from .config import Competition, Config
 from .dates import parse_date_label
 from .models import CompetitionData, Match
-from .overrides import MatchOverride, apply_overrides, load_overrides
+from .overrides import (
+    MatchOverride,
+    StandingExclusion,
+    apply_overrides,
+    apply_standing_exclusions,
+    load_overrides,
+    load_standing_exclusions,
+)
 from .scraper import (
     ScrapeError,
     fetch_html,
@@ -23,7 +30,12 @@ from .scraper import (
 logger = logging.getLogger(__name__)
 
 
-def _apply_overrides_to_data(data: CompetitionData, overrides: list[MatchOverride]) -> None:
+def _apply_overrides_to_data(
+    data: CompetitionData,
+    overrides: list[MatchOverride],
+    exclusions: list[StandingExclusion],
+) -> None:
+    apply_standing_exclusions(data, exclusions)
     apply_overrides(data.results, data.slug, overrides)
     apply_overrides(data.calendar, data.slug, overrides)
     if data.first_match is not None:
@@ -31,7 +43,10 @@ def _apply_overrides_to_data(data: CompetitionData, overrides: list[MatchOverrid
 
 
 def scrape_competition(
-    competition: Competition, config: Config, overrides: list[MatchOverride]
+    competition: Competition,
+    config: Config,
+    overrides: list[MatchOverride],
+    exclusions: list[StandingExclusion],
 ) -> CompetitionData:
     try:
         resultats_html = fetch_html(competition.resultats_url, config)
@@ -60,7 +75,7 @@ def scrape_competition(
                 stale=False,
                 error=None,
             )
-            _apply_overrides_to_data(data, overrides)
+            _apply_overrides_to_data(data, overrides, exclusions)
             cache.save(config.cache_dir, data)
             return data
 
@@ -101,7 +116,7 @@ def scrape_competition(
             stale=False,
             error=None,
         )
-        _apply_overrides_to_data(data, overrides)
+        _apply_overrides_to_data(data, overrides, exclusions)
         cache.save(config.cache_dir, data)
         return data
 
@@ -111,7 +126,7 @@ def scrape_competition(
         if previous is not None:
             previous.stale = True
             previous.error = str(exc)
-            _apply_overrides_to_data(previous, overrides)
+            _apply_overrides_to_data(previous, overrides, exclusions)
             return previous
         return CompetitionData(
             slug=competition.slug,
@@ -123,7 +138,10 @@ def scrape_competition(
 
 def scrape_all(config: Config) -> list[CompetitionData]:
     overrides = load_overrides(config.overrides_path)
-    return [scrape_competition(comp, config, overrides) for comp in config.competitions]
+    exclusions = load_standing_exclusions(config.overrides_path)
+    return [
+        scrape_competition(comp, config, overrides, exclusions) for comp in config.competitions
+    ]
 
 
 def load_all_from_cache(config: Config) -> list[CompetitionData | None]:
@@ -132,11 +150,12 @@ def load_all_from_cache(config: Config) -> list[CompetitionData | None]:
     Les corrections de `overrides.yaml` sont réappliquées à chaque appel,
     donc un changement y prend effet même sans relancer `scrape`."""
     overrides = load_overrides(config.overrides_path)
+    exclusions = load_standing_exclusions(config.overrides_path)
     result: list[CompetitionData | None] = []
     for comp in config.competitions:
         data = cache.load(config.cache_dir, comp.slug)
         if data is not None:
-            _apply_overrides_to_data(data, overrides)
+            _apply_overrides_to_data(data, overrides, exclusions)
         result.append(data)
     return result
 

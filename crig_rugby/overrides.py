@@ -7,6 +7,10 @@ par équipes (noms tels que scrapés, avant club_aliases, dans l'ordre
 domicile/extérieur d'origine du site) dans chaque catégorie, et on le
 corrige juste avant la mise en cache. Rechargé à chaque cycle de scraping,
 sans redémarrage nécessaire.
+
+Le même fichier permet aussi d'écarter du classement un club que le site
+y fait figurer à tort (section `exclusions_classement`, voir
+`apply_standing_exclusions`).
 """
 
 from __future__ import annotations
@@ -16,7 +20,14 @@ from pathlib import Path
 
 import yaml
 
-from .models import Match
+from .models import CompetitionData, Match
+
+
+@dataclass
+class StandingExclusion:
+    slug: str
+    # Nom EXACT tel que scrapé (avant club_aliases), comme partout ailleurs.
+    team: str
 
 
 @dataclass
@@ -88,3 +99,46 @@ def apply_overrides(matches: list[Match], slug: str, overrides: list[MatchOverri
             if override.score is not None:
                 match.home_score, match.away_score = override.score
                 match.played = True
+
+
+def load_standing_exclusions(path: Path) -> list[StandingExclusion]:
+    if not path.exists():
+        return []
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    return [
+        StandingExclusion(slug=item["slug"], team=item["equipe"])
+        for item in raw.get("exclusions_classement") or []
+    ]
+
+
+def _shift_rank(rank: str, removed_ranks: list[int]) -> str:
+    """Décale un rang du nombre de clubs écartés classés devant lui. Un rang
+    non numérique (cas jamais vu, mais le site est un tiers) est laissé tel quel."""
+    if not rank.strip().isdigit():
+        return rank
+    value = int(rank)
+    return str(value - sum(1 for removed in removed_ranks if removed < value))
+
+
+def apply_standing_exclusions(
+    data: CompetitionData, exclusions: list[StandingExclusion]
+) -> None:
+    """Retire du classement (et de la liste des clubs engagés, en
+    pré-saison) les clubs que coeurdurugby.com rattache à tort à la poule
+    (ex. Nancy en Fédérale 1 féminine, poule 1, en novembre 2026).
+
+    Les clubs classés derrière un club écarté remontent d'autant de places.
+    Idempotent : une fois le club retiré, une nouvelle application (à chaque
+    `generate`, sur le cache déjà corrigé) ne trouve plus rien à faire."""
+    excluded = {e.team for e in exclusions if e.slug == data.slug}
+    if not excluded:
+        return
+    removed_ranks = [
+        int(row.rank)
+        for row in data.standings
+        if row.team in excluded and row.rank.strip().isdigit()
+    ]
+    data.standings = [row for row in data.standings if row.team not in excluded]
+    for row in data.standings:
+        row.rank = _shift_rank(row.rank, removed_ranks)
+    data.engaged_clubs = [club for club in data.engaged_clubs if club.name not in excluded]

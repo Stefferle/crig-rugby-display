@@ -91,3 +91,16 @@ overrides:
   #   away_team: "Illkirch Graffenstaden"
   #   date_label: "samedi 12 septembre 2026"
   #   heure: "18:45"
+
+# Clubs à écarter du classement d'une catégorie, quand coeurdurugby.com les
+# rattache à tort à la poule. Les clubs classés derrière remontent d'autant
+# de places. Même prise en compte que ci-dessus ; à retirer une fois que le
+# site est à jour.
+#
+# - slug : la catégorie concernée (même valeur que dans config.yaml)
+# - equipe : nom EXACT tel que scrapé sur coeurdurugby.com (avant club_aliases)
+
+exclusions_classement:
+   # Nancy apparaît dans la F1F poule 1 (0 match joué) mais n'en fait pas partie
+   - slug: f1f
+     equipe: "Nancy"
