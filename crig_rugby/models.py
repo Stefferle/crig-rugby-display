@@ -55,6 +55,11 @@ class StandingRow:
     diff: str
     is_crig: bool = False
     logo_url: str | None = None
+    # Points déjà ajoutés (ou retranchés) à `points` par une entrée
+    # `ajustements_points` de overrides.yaml. Mémorisé dans le cache pour
+    # que la correction, réappliquée à chaque `generate`, ne se cumule pas
+    # (voir `overrides.apply_points_adjustments`).
+    points_adjustment: int = 0
 
 
 @dataclass

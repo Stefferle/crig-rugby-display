@@ -196,15 +196,89 @@ def test_standing_exclusion_removes_team_and_shifts_ranks():
     assert [c.name for c in data.engaged_clubs] == ["Bron"]
 
 
-def test_load_standing_exclusions(tmp_path):
-    from crig_rugby.overrides import StandingExclusion, load_standing_exclusions
+def test_load_standing_corrections(tmp_path):
+    from crig_rugby.overrides import (
+        PointsAdjustment,
+        StandingExclusion,
+        load_standing_corrections,
+    )
 
     path = tmp_path / "overrides.yaml"
     path.write_text(
-        'overrides: []\nexclusions_classement:\n  - slug: f1f\n    equipe: "Nancy"\n',
+        "overrides: []\n"
+        'exclusions_classement:\n  - slug: f1f\n    equipe: "Nancy"\n'
+        'ajustements_points:\n  - slug: r3\n    equipe: "Illkirch Graffenstaden"\n    points: -2\n',
         encoding="utf-8",
     )
-    assert load_standing_exclusions(path) == [StandingExclusion(slug="f1f", team="Nancy")]
-    # section absente : aucune exclusion
+    corrections = load_standing_corrections(path)
+    assert corrections.exclusions == [StandingExclusion(slug="f1f", team="Nancy")]
+    assert corrections.adjustments == [
+        PointsAdjustment(slug="r3", team="Illkirch Graffenstaden", points=-2)
+    ]
+    # sections absentes : aucune correction
     path.write_text("overrides: []\n", encoding="utf-8")
-    assert load_standing_exclusions(path) == []
+    corrections = load_standing_corrections(path)
+    assert corrections.exclusions == [] and corrections.adjustments == []
+
+
+def _r3_data():
+    from crig_rugby.models import CompetitionData, StandingRow
+
+    def row(rank, team, points):
+        return StandingRow(rank, team, points, "7", "0", "0", "0", "0", "0", "0")
+
+    return CompetitionData(
+        slug="r3",
+        label="R3",
+        standings=[
+            row("1", "Wolxheim", "32"),
+            row("2", "Saint-Dié", "25"),
+            row("3", "Illkirch Graffenstaden", "23"),
+            row("4", "Lauterbourg", "22"),
+            row("5", "Drusenheim", "-4"),
+        ],
+    )
+
+
+def test_points_adjustment_reranks():
+    from crig_rugby.overrides import PointsAdjustment, apply_points_adjustments
+
+    data = _r3_data()
+    adjustments = [
+        PointsAdjustment(slug="r3", team="Illkirch Graffenstaden", points=-2),
+        PointsAdjustment(slug="f2", team="Lauterbourg", points=10),  # autre catégorie
+    ]
+
+    apply_points_adjustments(data, adjustments)
+    assert [(r.rank, r.team, r.points) for r in data.standings] == [
+        ("1", "Wolxheim", "32"),
+        ("2", "Saint-Dié", "25"),
+        ("3", "Lauterbourg", "22"),
+        ("4", "Illkirch Graffenstaden", "21"),
+        ("5", "Drusenheim", "-4"),
+    ]
+
+
+def test_points_adjustment_survives_cache_roundtrip(tmp_path):
+    """Réappliqué à chaque `generate` sur le cache déjà corrigé (aller-retour
+    JSON compris) : le -2 ne doit pas se cumuler."""
+    from crig_rugby import cache
+    from crig_rugby.overrides import PointsAdjustment, apply_points_adjustments
+
+    adjustments = [PointsAdjustment(slug="r3", team="Illkirch Graffenstaden", points=-2)]
+    data = _r3_data()
+    apply_points_adjustments(data, adjustments)
+    cache.save(tmp_path, data)
+
+    reloaded = cache.load(tmp_path, "r3")
+    apply_points_adjustments(reloaded, adjustments)
+    crig = next(r for r in reloaded.standings if r.team == "Illkirch Graffenstaden")
+    assert crig.points == "21"
+
+    # entrée retirée de overrides.yaml : le club retrouve ses points et sa place
+    apply_points_adjustments(reloaded, [])
+    assert [(r.rank, r.team, r.points) for r in reloaded.standings][2] == (
+        "3",
+        "Illkirch Graffenstaden",
+        "23",
+    )

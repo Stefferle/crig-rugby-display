@@ -8,9 +8,10 @@ domicile/extérieur d'origine du site) dans chaque catégorie, et on le
 corrige juste avant la mise en cache. Rechargé à chaque cycle de scraping,
 sans redémarrage nécessaire.
 
-Le même fichier permet aussi d'écarter du classement un club que le site
+Le même fichier corrige aussi le classement : écarter un club que le site
 y fait figurer à tort (section `exclusions_classement`, voir
-`apply_standing_exclusions`).
+`apply_standing_exclusions`) et ajouter ou retrancher des points à un club
+(section `ajustements_points`, voir `apply_points_adjustments`).
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ from pathlib import Path
 
 import yaml
 
-from .models import CompetitionData, Match
+from .models import CompetitionData, Match, StandingRow
 
 
 @dataclass
@@ -28,6 +29,19 @@ class StandingExclusion:
     slug: str
     # Nom EXACT tel que scrapé (avant club_aliases), comme partout ailleurs.
     team: str
+
+
+@dataclass
+class PointsAdjustment:
+    slug: str
+    team: str  # nom EXACT tel que scrapé (avant club_aliases)
+    points: int  # à ajouter (positif) ou retrancher (négatif)
+
+
+@dataclass
+class StandingCorrections:
+    exclusions: list[StandingExclusion]
+    adjustments: list[PointsAdjustment]
 
 
 @dataclass
@@ -101,14 +115,27 @@ def apply_overrides(matches: list[Match], slug: str, overrides: list[MatchOverri
                 match.played = True
 
 
-def load_standing_exclusions(path: Path) -> list[StandingExclusion]:
+def load_standing_corrections(path: Path) -> StandingCorrections:
     if not path.exists():
-        return []
+        return StandingCorrections(exclusions=[], adjustments=[])
     raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    return [
-        StandingExclusion(slug=item["slug"], team=item["equipe"])
-        for item in raw.get("exclusions_classement") or []
-    ]
+    return StandingCorrections(
+        exclusions=[
+            StandingExclusion(slug=item["slug"], team=item["equipe"])
+            for item in raw.get("exclusions_classement") or []
+        ],
+        adjustments=[
+            PointsAdjustment(slug=item["slug"], team=item["equipe"], points=int(item["points"]))
+            for item in raw.get("ajustements_points") or []
+        ],
+    )
+
+
+def apply_standing_corrections(data: CompetitionData, corrections: StandingCorrections) -> None:
+    # Exclusions d'abord : le reclassement après ajustement de points se
+    # fait alors sur la poule réelle.
+    apply_standing_exclusions(data, corrections.exclusions)
+    apply_points_adjustments(data, corrections.adjustments)
 
 
 def _shift_rank(rank: str, removed_ranks: list[int]) -> str:
@@ -142,3 +169,45 @@ def apply_standing_exclusions(
     for row in data.standings:
         row.rank = _shift_rank(row.rank, removed_ranks)
     data.engaged_clubs = [club for club in data.engaged_clubs if club.name not in excluded]
+
+
+def _points_sort_key(row: StandingRow) -> int:
+    try:
+        return -int(row.points)
+    except ValueError:
+        return 1  # points illisibles (jamais vu) : en fin de tableau
+
+
+def apply_points_adjustments(data: CompetitionData, adjustments: list[PointsAdjustment]) -> None:
+    """Ajoute ou retranche des points à un club, quand le classement de
+    coeurdurugby.com est faux (ex. CRIG -2 en R3 en novembre 2026).
+
+    Idempotent malgré la réapplication à chaque `generate` sur le cache déjà
+    corrigé : on n'applique que l'écart entre l'ajustement demandé et celui
+    déjà mémorisé dans `StandingRow.points_adjustment`. Retirer l'entrée de
+    overrides.yaml rend donc aussi au club ses points d'origine.
+
+    Si des points ont changé, le tableau est retrié par points décroissants
+    et renuméroté ; à égalité, l'ordre du site est conservé (tri stable),
+    faute de connaître ses critères de départage."""
+    wanted: dict[str, int] = {}
+    for adjustment in adjustments:
+        if adjustment.slug == data.slug:
+            wanted[adjustment.team] = wanted.get(adjustment.team, 0) + adjustment.points
+    changed = False
+    for row in data.standings:
+        target = wanted.get(row.team, 0)
+        delta = target - row.points_adjustment
+        if not delta:
+            continue
+        try:
+            points = int(row.points)
+        except ValueError:
+            continue
+        row.points = str(points + delta)
+        row.points_adjustment = target
+        changed = True
+    if changed:
+        data.standings.sort(key=_points_sort_key)
+        for position, row in enumerate(data.standings, start=1):
+            row.rank = str(position)

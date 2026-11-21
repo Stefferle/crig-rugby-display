@@ -58,6 +58,8 @@ Corrections manuelles pour un match dont la reprogrammation n'apparaît pas enco
 
 La section `exclusions_classement` écarte du classement (et des clubs engagés en pré-saison) un club que le site rattache à tort à la poule : chaque entrée indique `slug` et `equipe` (nom **exact du site**). Les clubs classés derrière remontent d'autant de places.
 
+La section `ajustements_points` corrige un classement faux : chaque entrée indique `slug`, `equipe` (nom **exact du site**) et `points` à ajouter ou retrancher (ex. `-2`). Le tableau est alors retrié par points ; à égalité, l'ordre du site est conservé. L'ajustement déjà appliqué est mémorisé dans le cache, il ne se cumule donc pas d'un `generate` à l'autre, et retirer l'entrée rend au club ses points d'origine. À retirer dès que le site a corrigé, sinon la correction s'ajouterait à la sienne.
+
 Le fichier est relu à chaque cycle, donc pas besoin de redémarrer le service. Une fois le site à jour, on retire l'entrée.
 
 ## Résilience

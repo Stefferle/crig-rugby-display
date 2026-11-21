@@ -104,3 +104,18 @@ exclusions_classement:
    # Nancy apparaît dans la F1F poule 1 (0 match joué) mais n'en fait pas partie
    - slug: f1f
      equipe: "Nancy"
+
+# Points à ajouter (positif) ou retrancher (négatif) à un club, quand le
+# classement du site est faux. Le classement est alors retrié par points
+# (à égalité, l'ordre du site est conservé). Même prise en compte que
+# ci-dessus ; à retirer une fois que le site est à jour, sinon la
+# correction s'appliquerait en plus de celle du site.
+#
+# - slug : la catégorie concernée (même valeur que dans config.yaml)
+# - equipe : nom EXACT tel que scrapé sur coeurdurugby.com (avant club_aliases)
+# - points : ex. -2 ou 3
+
+ajustements_points:
+   - slug: r3
+     equipe: "Illkirch Graffenstaden"
+     points: -2
