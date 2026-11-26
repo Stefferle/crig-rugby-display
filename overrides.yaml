@@ -71,6 +71,11 @@ overrides:
      date_label: "samedi 7 novembre 2026"
      heure: "16:00"
 
+   - slug: f1f
+     home_team: "Illkirch Graffenstaden"
+     away_team: "Grenoble UC - Saint Martin D'heres"
+     heure: "13:30"
+
    # aller et retour inversés : aller (15/11/2026) joué à Saverne,
    # retour (07/03/2027) joué à Illkirch
    # Le site garde Illkirch-Saverne 25-23 mais a saisi le score dans
